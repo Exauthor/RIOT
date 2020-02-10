@@ -111,7 +111,6 @@ export default {
           .call(animation, that.percent, oldValue)
 
         oldValue = that.settings.value || that.percent
-        // await that.getData()
 
         setTimeout(await animate, 1200)
       }
@@ -121,6 +120,3 @@ export default {
   }
 }
 </script>
-
-<style lang="stylus">
-</style>
