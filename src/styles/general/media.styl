@@ -1,0 +1,32 @@
+// Create after mixin - media-query('md', width)
+for i in 1..12
+  .xs{i}
+      flex 0 0 ((100 / 12) * i)%
+      max-width ((100 / 12) * i)%
+
+@media (min-width: 600px)
+  for i in 1..12
+    .sm{i}
+        flex 0 0 ((100 / 12) * i)%
+        max-width ((100 / 12) * i)%
+
+@media (min-width: 960px)
+  for i in 1..12
+    .md{i}
+        flex 0 0 ((100 / 12) * i)%
+        max-width ((100 / 12) * i)%
+
+@media (min-width: 1264px)
+  for i in 1..12
+    .lg{i}
+        flex 0 0 ((100 / 12) * i)%
+        max-width ((100 / 12) * i)%
+
+@media (min-width: 1904px)
+  for i in 1..12
+    .xl{i}
+        flex 0 0 ((100 / 12) * i)%
+        max-width ((100 / 12) * i)%
+
+
+

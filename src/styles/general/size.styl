@@ -1,0 +1,14 @@
+.br-1
+  border-radius size-1
+
+
+
+size = 0 size-1 size-2 size-3 size-4 size-5
+directions = '' 'x' 'y' 't' 'r' 'b' 'l'
+properties = 'p' 'm'
+
+for property in properties
+  for direction in directions
+    for row in 0..5
+      .{property}{direction}-{row}
+        determine-property-size(property, direction, size[row])

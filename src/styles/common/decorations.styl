@@ -1,0 +1,31 @@
+.circe-gradient
+  circle(20vmin)
+  display block
+  background linear-gradient(75 deg, color-main--light, color-main--dark)
+  position absolute
+  left 5vmin
+  bottom 10vmin
+
+
+#mainGradient
+  *:nth-child(1)
+    stop-color color-main
+  *:nth-child(2)
+    stop-color color-main--dark
+
+.wave
+  fill url(#mainGradient)
+
+
+.clip-wave
+  position absolute
+  right 50px
+  top 30px
+  width 40vmin
+  svg
+    width 100%
+  //.animation-cube
+    //background white
+    //width 40px
+    //height 100%
+

@@ -1,5 +1,6 @@
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <h1> Creation: WARINYOURSELF</h1>
+    <h1> OS: store from value</h1>
   </div>
 </template>

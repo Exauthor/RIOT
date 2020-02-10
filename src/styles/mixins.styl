@@ -1,0 +1,42 @@
+circle(n)
+  width n
+  height n
+  border-radius 50%
+
+determine-property(property)
+  if (property == 'p')
+    return 'padding'
+  else if (property == 'm')
+    return 'margin'
+
+determine-direction(direction)
+  if (direction == 't')
+    return 'top'
+  else if (direction == 'r')
+    return 'right'
+  else if (direction == 'b')
+    return 'bottom'
+  else if (direction == 'l')
+    return 'left'
+  else if (direction == 'x')
+    return false
+  else if (direction == 'y')
+    return false
+
+determine-size(size, direction)
+  if (direction == 'x')
+    return 0 size
+  else if (direction == 'y')
+    return size 0
+  else
+    return size
+
+determine-property-size(property, direction, size)
+  size = determine-size(size, direction)
+  property = determine-property(property)
+  direction = determine-direction(direction)
+
+  if (direction)
+    {property}-{direction} size
+  else
+    {property} size
