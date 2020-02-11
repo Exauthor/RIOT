@@ -3,7 +3,8 @@ import bodyParser from 'body-parser'
 import cors from 'cors'
 import http from 'http'
 // const router = require('./router/index.ts')
-import router from './router/index'
+import router from './controllers/index'
+import { execSync } from 'child_process'
 
 require('dotenv').config()
 
@@ -39,4 +40,17 @@ app.use((req, res, next) => {
     message: err.message,
     error: err
   })
+})
+
+app.get('/memory', (req, res) => {
+  let freePrecent = execSync('free | awk \'/Mem/{printf("%d"), $3/$2*100}\'').toString('utf8')
+  let freeMemory = execSync('free | awk \'/Mem/{printf("%d"), $3/1024}\'').toString('utf8')
+
+  res.json({ 'percentMemory': 100 - freePrecent, 'usedMemory': freeMemory })
+})
+
+app.get('/cpu-up', (req, res) => {
+  execSync('sysbench --test=cpu --num-threads=4 --cpu-max-prime=20000 run')
+
+  res.json({ 'cpu': 'start' })
 })
