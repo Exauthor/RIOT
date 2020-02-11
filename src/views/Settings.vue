@@ -6,7 +6,7 @@
 
 <script lang='ts'>
 import { Component, Vue } from 'vue-property-decorator'
-import ChartPie from '@/components/block/ChartPie.vue'
+import ChartPie from '@/components/block/ChartPie.ts'
 // eslint-disable-next-line no-unused-vars
 import { ChartPieSetting } from '@/types'
 
