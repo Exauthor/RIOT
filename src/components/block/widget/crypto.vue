@@ -20,7 +20,7 @@ import axios from 'axios'
 @Component({
   name: 'CryptoWidget'
 })
-export default class HelloWorld extends Vue {
+export default class CryptoWidget extends Vue {
   @Prop({ required: true, type: Object }) readonly settings!: any;
 
   coins = []
@@ -41,7 +41,6 @@ export default class HelloWorld extends Vue {
   async mounted() {
     if (this.view === 'list') {
       const response: any = await axios('https://api.coinmarketcap.com/v1/ticker/')
-      console.log(response, 'response')
       this.coins = response.data.filter((coin: any) => this.coinsSequence.includes(coin.id))
     }
   }

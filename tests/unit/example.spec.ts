@@ -1,12 +1,10 @@
 import { shallowMount } from '@vue/test-utils'
-import HelloWorld from '@/components/HelloWorld.vue'
+import MPD from '@/components/block/widget/mpd'
 
-describe('HelloWorld.vue', () => {
-  it('renders props.msg when passed', () => {
-    const msg = 'new message'
-    const wrapper = shallowMount(HelloWorld, {
-      propsData: { msg }
-    })
+describe('MpdWidget.vue', () => {
+  it('renders text widget', () => {
+    const msg = 'MPD'
+    const wrapper = shallowMount(MPD)
     expect(wrapper.text()).toMatch(msg)
   })
 })

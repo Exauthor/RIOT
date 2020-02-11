@@ -7,7 +7,7 @@
 <script>
 import { Component, Vue } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
-import WidgetBlock from '@/components/block/widget/index.vue'
+import WidgetBlock from '@/components/block/widget/index.ts'
 
 @Component({
   name: 'IndexPage',

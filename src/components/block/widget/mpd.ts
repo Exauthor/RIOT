@@ -1,8 +1,3 @@
-<template lang="pug">
-  div MPD
-</template>
-
-<script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component({
@@ -10,5 +5,8 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 })
 export default class extends Vue {
   @Prop() settigns!: any;
+
+  render(h): Vnode {
+    return h('div', ['MPD'])
+  }
 }
-</script>
