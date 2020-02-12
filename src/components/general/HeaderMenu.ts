@@ -1,13 +1,3 @@
-<template lang="pug">
-  div(:class='classes' v-if='view === "inPage"')
-    p(@click='goBack') back
-    .header-menu__active
-      h1 {{ this.$route.meta.headerTitle || 'current block' }}
-  div(:class='classes' v-else)
-    p Active block
-</template>
-
-<script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
@@ -21,6 +11,20 @@ export default class extends Vue {
     return classes
   }
 
+  render(h): VNode {
+    if (this.view === 'inPage') {
+      return h('div', { class: this.classes }, [
+        h('p', { on: { click: 'goBack' } }),
+        h('div', { class: ['header-menu__active'] }, [
+          h('h2', [this.$route.meta.headerTitle || 'current block'])
+        ])
+      ]
+      )
+    } else {
+      return h('div', { class: this.classes }, [h('p', 'Active block')])
+    }
+  }
+
   get view(): string {
     if (this.$route.meta.headerTitle) {
       return 'inPage'
@@ -32,4 +36,3 @@ export default class extends Vue {
     this.$router.push({ name: 'index' })
   }
 }
-</script>

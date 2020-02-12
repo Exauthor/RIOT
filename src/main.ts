@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import '@/styles/index.styl'
 
-import App from '@/App.vue'
+import App from '@/App.ts'
 import store from '@/store'
 import router from '@/router'
 import i18n from '@/locales'

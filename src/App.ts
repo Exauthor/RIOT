@@ -1,17 +1,7 @@
-<template>
-  <component
-    :is="layout + 'Layout'"
-    id="app"
-  >
-    <router-view />
-  </component>
-</template>
-
-<script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { PageModule } from '@/store/modules/page'
-import noneLayout from '@/layout/none.vue'
-import defaultLayout from '@/layout/default.vue'
+import noneLayout from '@/layout/none.ts'
+import defaultLayout from '@/layout/default.ts'
 import { SystemModule } from '@/store/modules/system'
 
 @Component({
@@ -22,6 +12,9 @@ import { SystemModule } from '@/store/modules/system'
   }
 })
 export default class extends Vue {
+  render(h): VNode {
+    return h('component', { is: this.layout + 'Layout', id: 'app' }, [h('router-view')])
+  }
   get os() {
     return SystemModule.os
   }
@@ -30,4 +23,3 @@ export default class extends Vue {
     return PageModule.layout
   }
 }
-</script>

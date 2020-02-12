@@ -43,10 +43,10 @@ app.use((req, res, next) => {
 })
 
 app.get('/memory', (req, res) => {
-  let freePrecent = execSync('free | awk \'/Mem/{printf("%d"), $3/$2*100}\'').toString('utf8')
-  let freeMemory = execSync('free | awk \'/Mem/{printf("%d"), $3/1024}\'').toString('utf8')
+  let freePrecent: string = execSync('free | awk \'/Mem/{printf("%d"), $3/$2*100}\'').toString('utf8')
+  let freeMemory: string = execSync('free | awk \'/Mem/{printf("%d"), $3/1024}\'').toString('utf8')
 
-  res.json({ 'percentMemory': 100 - freePrecent, 'usedMemory': freeMemory })
+  res.json({ 'percentMemory': 100 - parseInt(freePrecent), 'usedMemory': freeMemory })
 })
 
 app.get('/cpu-up', (req, res) => {
