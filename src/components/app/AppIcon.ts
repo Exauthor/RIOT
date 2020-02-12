@@ -1,5 +1,9 @@
-<template>
-  <svg
+import { Component, Prop, Vue } from 'vue-property-decorator'
+
+@Component({
+  name: 'HeaderBlock',
+  template: `
+    <svg
     v-if="name === 'statistics'"
     xmlns="http://www.w3.org/2000/svg"
     style="isolation:isolate"
@@ -196,16 +200,9 @@
       d="M20 4c-2-2-5-4-9-4C5 0 0 5 0 12q0 9 20 23 20-13 20-23c0-9-5-12-11-12-4 0-7 2-9 4z"
     />
   </svg>
-</template>
-
-<script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator'
-
-@Component({
-  name: 'HeaderBlock'
+  `
 })
 export default class extends Vue {
   @Prop({ default: 'love' }) name!: string
   @Prop({ default: true }) colorful!: boolean
 }
-</script>

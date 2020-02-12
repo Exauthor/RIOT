@@ -1,13 +1,5 @@
-<template lang='pug'>
-  .about
-    ChartPie(:settings='temperatureSettings')
-    ChartPie(:settings='memorySettings')
-</template>
-
-<script lang='ts'>
 import { Component, Vue } from 'vue-property-decorator'
 import ChartPie from '@/components/block/ChartPie.ts'
-// eslint-disable-next-line no-unused-vars
 import { ChartPieSetting } from '@/types'
 
 @Component({
@@ -29,10 +21,16 @@ export default class extends Vue {
     title: 'Memory'
   }
 
+  render(h): VNode {
+    return h('div', { class: 'about' }, [
+      h(ChartPie, { props: { settings: this.temperatureSettings } }),
+      h(ChartPie, { props: { settings: this.memorySettings } })
+    ])
+  }
+
   mounted() {
     setInterval(() => {
       this.temperatureSettings.percent = Math.floor(Math.random() * 20)
     }, 2000)
   }
 }
-</script>

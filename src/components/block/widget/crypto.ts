@@ -45,7 +45,6 @@ export default class CryptoWidget extends Vue {
   }
 
   async mounted() {
-    console.log(this)
     if (this.view === 'list') {
       const response: any = await axios('https://api.coinmarketcap.com/v1/ticker/')
       this.coins = response.data.filter((coin: any) => this.coinsSequence.includes(coin.id))

@@ -1,8 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Index from '../views/Index.vue'
-import About from '../views/About.vue'
-import Settings from '../views/Settings.vue'
+import Index from '../views/Index'
+import Settings from '../views/Settings'
 
 Vue.use(VueRouter)
 
@@ -23,14 +22,6 @@ const routes = [
       headerTitle: 'Settings',
       layout: 'none'
     }
-  },
-  {
-    path: '/about',
-    name: 'about',
-    meta: {
-      layout: 'default'
-    },
-    component: About
   }
 ]
 

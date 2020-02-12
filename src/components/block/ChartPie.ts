@@ -1,4 +1,5 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ChartPieSetting } from '@/types'
 import * as d3 from 'd3'
 
 @Component({
@@ -6,7 +7,7 @@ import * as d3 from 'd3'
 })
 export default class ChartPie extends Vue {
   @Prop({ default: 'temperature', type: String }) option!: string
-  @Prop({ type: Object, required: true }) settings: any
+  @Prop({ type: Object, required: true }) settings!: ChartPieSetting
 
   get percent():number {
     return this.settings.percent

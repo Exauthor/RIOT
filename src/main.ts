@@ -11,7 +11,7 @@ import ElementUI from 'element-ui'
 
 import './registerServiceWorker'
 
-import AppIcon from '@/components/app/AppIcon.vue'
+import AppIcon from '@/components/app/AppIcon.ts'
 
 Vue.use(ElementUI, {
   i18n: (key: string, value: string) => i18n.t(key, value)
