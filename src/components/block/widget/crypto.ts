@@ -23,7 +23,10 @@ export default class CryptoWidget extends Vue {
             h('AppIcon', { class: 'crypto-block__icon', props: { name: coin.id } }),
             h('div', { class: 'crupto-block__info' }, [
               h('div', { class: 'crupto-block__title' }, coin.symbol),
-              h('div', { class: 'crupto-block__change' }, coin.percent_change_24h + '%')
+              h('div', { class: 'crupto-block__number' }, [
+                h('div', { class: 'crupto-block__change' }, coin.percent_change_24h + '%'),
+                h('div', { class: 'crupto-block__cost' }, this.formatNumber(coin.price_usd) + '$')
+              ])
             ])
           ]
           )
@@ -45,6 +48,10 @@ export default class CryptoWidget extends Vue {
   }
   get coinsSequence(): Array<string> {
     return ['bitcoin', 'ethereum', 'cardano', 'neo']
+  }
+
+  formatNumber(cost: string): string {
+    return String(parseFloat(cost.slice(0, -8)))
   }
 
   async mounted() {
