@@ -1,5 +1,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ChartPieSetting } from '@/types'
+import { CreateElement, VNode } from 'vue/types'
 import * as d3 from 'd3'
 
 @Component({
@@ -13,7 +14,7 @@ export default class ChartPie extends Vue {
     return this.settings.percent
   }
 
-  render(h): VNode {
+  render(h: CreateElement): VNode {
     return h('svg', { ref: 'svgPie', class: ['chart-pie'] })
   }
 
@@ -29,7 +30,8 @@ export default class ChartPie extends Vue {
     let minValue = Math.min(width, height) / 2
     let radius = (minValue / 2) - margin * 2
     let range = d3.scaleLinear().domain([0, 100]).range([17, 100])
-    let svg = d3.select(this.$refs.svgPie)
+    const node = this.$refs.svgPie
+    let svg = d3.select(node as Element)
       .attr('width', minValue)
       .attr('height', minValue)
       .append('g')
@@ -46,7 +48,7 @@ export default class ChartPie extends Vue {
       .cornerRadius(radius * 0.1)
 
     group.append('path')
-      .attr('d', arc({ endAngle: Math.PI * 2 }))
+      .attr('d', arc.endAngle(Math.PI / 2))
       .attr('style', 'fill: rgba(0,0,0,.5)')
 
     let path = group.append('path')
@@ -58,12 +60,11 @@ export default class ChartPie extends Vue {
       .attr('dy', -20)
       .attr('dx', 0)
 
-    // let textValue = (that.option === 'memory') ? that.data.usedMemory : that.percent
     let textValue = this.settings.value || that.percent
 
     let text = svg.append('text')
       .datum(textValue)
-      .text(d => d + '%')
+      .text((d: any) => d + '%')
       .attr('class', 'middleText')
       .attr('text-anchor', 'middle')
       .attr('dy', 20)
@@ -79,7 +80,7 @@ export default class ChartPie extends Vue {
     text.attr('style', `fill: ${color}; font-size: 2rem`)
 
     let animation = (transition: any, percent: number, oldValue: number) => {
-      transition.attrTween('d', (d) => {
+      transition.attrTween('d', (d: any) => {
         let value = this.settings.value || that.percent
 
         let textValue = value

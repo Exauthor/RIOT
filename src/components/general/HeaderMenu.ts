@@ -1,4 +1,5 @@
 import { Component, Vue } from 'vue-property-decorator'
+import { CreateElement, VNode } from 'vue/types'
 
 @Component({
   name: 'HeaderBlock'
@@ -11,10 +12,10 @@ export default class extends Vue {
     return classes
   }
 
-  render(h): VNode {
+  render(h: CreateElement): VNode {
     if (this.view === 'inPage') {
       return h('div', { class: this.classes }, [
-        h('p', { on: { click: 'goBack' } }),
+        h('p', { on: { click: this.goBack } }, [ 'go back' ]),
         h('div', { class: ['header-menu__active'] }, [
           h('h2', [this.$route.meta.headerTitle || 'current block'])
         ])

@@ -1,6 +1,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { WidgetBlockGeneralSettings } from '@/types'
+import { CreateElement, VNode } from 'vue/types'
 import axios from 'axios'
 
 @Component({
@@ -11,7 +12,7 @@ export default class CryptoWidget extends Vue {
 
   coins = []
 
-  render(h): VNode {
+  render(h: CreateElement): VNode {
     if (this.view === 'list') {
       return h('div',
         { class: 'crypto-blocks' },
@@ -28,6 +29,8 @@ export default class CryptoWidget extends Vue {
           )
         })
       )
+    } else {
+      return h('div', 'not support view')
     }
   }
 

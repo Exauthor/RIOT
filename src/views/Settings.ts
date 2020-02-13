@@ -1,6 +1,7 @@
 import { Component, Vue } from 'vue-property-decorator'
 import ChartPie from '@/components/block/ChartPie.ts'
 import { ChartPieSetting } from '@/types'
+import { CreateElement, VNode } from 'vue/types'
 
 @Component({
   name: 'SettingsPage',
@@ -21,7 +22,7 @@ export default class extends Vue {
     title: 'Memory'
   }
 
-  render(h): VNode {
+  render(h: CreateElement): VNode {
     return h('div', { class: 'about' }, [
       h(ChartPie, { props: { settings: this.temperatureSettings } }),
       h(ChartPie, { props: { settings: this.memorySettings } })
