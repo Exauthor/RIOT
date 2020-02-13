@@ -10,20 +10,27 @@
 
 .crypto-block
   display flex
+  position relative
   align-items center
-  justify-content space-between
+  justify-content center
+  flex-direction column
   width calc(var(--size-widget-block) - 12px)
   height calc(var(--size-widget-block) - 24px)
 
 .crypto-block__icon
-  width 70%
-  height 70%
+  width 85%
+  height 85%
 
 .crupto-block__info
-  height 100%
+  padding 5px 10px
+  background rgba(0, 0, 0, .7)
+  height 30%
+  position absolute
+  bottom 0
+  width 100%
   display flex
-  flex-direction column
   justify-content space-between
+  align-items center
   text-align right
 
 .crypto-block--up
