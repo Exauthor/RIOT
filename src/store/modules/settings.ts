@@ -32,6 +32,7 @@ class Settings extends VuexModule implements SettingsState {
       }
     }
   ]
+
   widgetBlockGeneralSettings = [
     {
       title: 'Crypto',
