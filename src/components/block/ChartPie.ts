@@ -24,10 +24,8 @@ export default class ChartPie extends Vue {
 
   async initPieChart() {
     let that = this
-    let width = document.documentElement.clientWidth
-    let height = document.documentElement.clientHeight
     let margin = 10
-    let minValue = Math.min(width, height) / 2
+    let minValue = this.$refs.svgPie.parentElement.offsetWidth
     let radius = (minValue / 2) - margin * 2
     let range = d3.scaleLinear().domain([0, 100]).range([17, 100])
     const node = this.$refs.svgPie
