@@ -20,11 +20,11 @@ export default class CryptoWidget extends Vue {
             class: ['crypto-block', `crypto-block--${parseFloat(coin.percent_change_24h) > 0 ? 'up' : 'down'}`]
           }, [
             h('AppIcon', { class: 'crypto-block__icon', props: { name: coin.id } }),
-            h('div', { class: 'crupto-block__info' }, [
-              h('div', { class: 'crupto-block__title' }, coin.symbol),
-              h('div', { class: 'crupto-block__number' }, [
-                h('div', { class: 'crupto-block__change' }, coin.percent_change_24h + '%'),
-                h('div', { class: 'crupto-block__cost' }, this.formatNumber(coin.price_usd) + '$')
+            h('div', { class: 'crypto-block__info' }, [
+              h('div', { class: 'crypto-block__title' }, coin.symbol),
+              h('div', { class: 'crypto-block__number' }, [
+                h('div', { class: 'crypto-block__change' }, coin.percent_change_24h + '%'),
+                h('div', { class: 'crypto-block__cost' }, this.formatNumber(coin.price_usd) + '$')
               ])
             ])
           ]

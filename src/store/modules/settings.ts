@@ -1,10 +1,10 @@
 import { Module, VuexModule, getModule } from 'vuex-module-decorators'
 import store from '@/store'
-import { WidgetBlock, WidgetBlockGeneralSettings } from '@/types'
+import { IWidgetBlock, IWidgetBlockGeneralSettings } from '@/types'
 
 export interface SettingsState {
-  widgetBlocks: Array<WidgetBlock>
-  widgetBlockGeneralSettings: Array<WidgetBlockGeneralSettings>
+  widgetBlocks: Array<IWidgetBlock>
+  widgetBlockGeneralSettings: Array<IWidgetBlockGeneralSettings>
 }
 
 @Module({ dynamic: true, store, name: 'settings' })
@@ -21,7 +21,11 @@ class Settings extends VuexModule implements SettingsState {
       title: 'Settings',
       component: 'SettingsWidget',
       settings: {
-        size: [1, 1]
+        size: [1, 1],
+        view: 'chartPie',
+        chartSettings: {
+          view: 'small'
+        }
       }
     },
     {
@@ -52,7 +56,9 @@ class Settings extends VuexModule implements SettingsState {
     }
   ]
   get getWidgetSettings() {
-    return (title: string): WidgetBlockGeneralSettings | undefined => this.widgetBlockGeneralSettings.find((settings) => settings.title === title)
+    return (title: string): IWidgetBlockGeneralSettings | undefined => {
+      return this.widgetBlockGeneralSettings.find((settings) => settings.title === title)
+    }
   }
 }
 

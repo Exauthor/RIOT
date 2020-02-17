@@ -5,7 +5,7 @@ import { CreateElement, VNode } from 'vue/types'
   name: 'CryptoWidget'
 })
 export default class extends Vue {
-  @Prop() settigns!: any;
+  @Prop() settings!: any;
 
   render(h: CreateElement): VNode {
     return h('div', ['MPD'])

@@ -1,11 +1,11 @@
-export interface WidgetBlock {
+export interface IWidgetBlock {
   title: string
   component: string
   settings: { size: number[] }
   url?: string
 }
 
-export interface WidgetBlockGeneralSettings {
+export interface IWidgetBlockGeneralSettings {
   breakpoints: Array<number[]>
 }
 

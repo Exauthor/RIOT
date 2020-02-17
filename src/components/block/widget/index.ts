@@ -1,5 +1,5 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { WidgetBlock } from '@/types'
+import { IWidgetBlock } from '@/types'
 import CryptoWidget from '@/components/block/widget/crypto.ts'
 import MpdWidget from '@/components/block/widget/mpd.ts'
 import SettingsWidget from '@/components/block/widget/settings.ts'
@@ -14,7 +14,7 @@ import { CreateElement, VNode } from 'vue/types'
   }
 })
 export default class extends Vue {
-  @Prop({ type: Object, required: true }) block!: WidgetBlock;
+  @Prop({ type: Object, required: true }) block!: IWidgetBlock;
 
   render(h: CreateElement): VNode {
     return h('div', { class: this.classes }, [
