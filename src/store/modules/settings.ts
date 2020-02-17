@@ -24,7 +24,9 @@ class Settings extends VuexModule implements SettingsState {
         size: [1, 1],
         view: 'chartPie',
         chartSettings: {
-          view: 'small'
+          view: 'small',
+          value: 0,
+          percent: 0
         }
       }
     },

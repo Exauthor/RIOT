@@ -1,5 +1,5 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
-import { ChartPieSetting } from '@/types'
+import { IChartPieSetting } from '@/types'
 import { CreateElement, VNode } from 'vue/types'
 import * as d3 from 'd3'
 
@@ -8,7 +8,7 @@ import * as d3 from 'd3'
 })
 export default class ChartPie extends Vue {
   @Prop({ default: 'temperature', type: String }) option!: string
-  @Prop({ type: Object, required: true }) settings!: ChartPieSetting
+  @Prop({ type: Object, required: true }) settings!: IChartPieSetting
 
   get percent():number {
     return this.settings.percent
@@ -58,7 +58,7 @@ export default class ChartPie extends Vue {
       .attr('dy', -20)
       .attr('dx', 0)
 
-    let textValue = this.settings.value || that.percent
+    let textValue = this.settings.value || that.percent || 0
 
     let text = svg.append('text')
       .datum(textValue)

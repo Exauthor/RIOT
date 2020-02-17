@@ -2,7 +2,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import ChartPie from '@/components/block/ChartPie.ts'
 import { CreateElement, VNode } from 'vue/types'
 
-import { ChartPieSetting } from '@/types'
+import { IChartPieSetting } from '@/types'
 
 @Component({
   name: 'settingsWidget'
@@ -10,14 +10,10 @@ import { ChartPieSetting } from '@/types'
 export default class extends Vue {
   @Prop() settings!: any;
 
-  temperatureSettings: ChartPieSetting = {
-    percent: 0
-  }
-
   render(h: CreateElement): VNode {
     if (this.settings.view === 'chartPie') {
       return h('div', { on: { click: this.goToPage } }, [
-        h(ChartPie, { props: { settings: this.temperatureSettings } })
+        h(ChartPie, { props: { settings: this.settings.chartSettings } })
       ])
     }
     return h('div', { on: { click: this.goToPage } }, ['Settings'])

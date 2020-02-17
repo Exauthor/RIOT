@@ -1,37 +1,54 @@
 import { Component, Vue } from 'vue-property-decorator'
-import ChartPie from '@/components/block/ChartPie.ts'
-import { ChartPieSetting } from '@/types'
+// import ChartPie from '@/components/block/ChartPie.ts'
+import { IChartPieSetting, IWidgetBlock } from '@/types'
 import { CreateElement, VNode } from 'vue/types'
 
+import WidgetBlock from '@/components/block/widget/index.ts'
+
 @Component({
-  name: 'SettingsPage',
-  components: {
-    ChartPie
-  }
+  name: 'SettingsPage'
 })
 export default class extends Vue {
-  temperatureSettings: ChartPieSetting = {
-    percent: 0
-  }
-
-  memorySettings: ChartPieSetting = {
-    percent: 0,
-    value: 4200,
-    pre: 'Mb',
-    color: 'var(--color-active)',
-    title: 'Memory'
-  }
+  settingsBlocks: Array<IWidgetBlock> = [
+    {
+      title: 'Settings',
+      component: 'SettingsWidget',
+      settings: {
+        size: [3, 3],
+        view: 'chartPie',
+        chartSettings: {
+          percent: 0
+        }
+      }
+    },
+    {
+      title: 'Settings',
+      component: 'SettingsWidget',
+      settings: {
+        size: [3, 3],
+        view: 'chartPie',
+        chartSettings: {
+          percent: 0,
+          value: 4200,
+          pre: 'Mb',
+          color: 'var(--color-active)',
+          title: 'Memory'
+        }
+      }
+    }
+  ]
 
   render(h: CreateElement): VNode {
-    return h('div', { class: 'about' }, [
-      h(ChartPie, { props: { settings: this.temperatureSettings } }),
-      h(ChartPie, { props: { settings: this.memorySettings } })
-    ])
+    return h('div', { class: 'settings-page' },
+      this.settingsBlocks.map((block, index) => {
+        return h(WidgetBlock, { props: { block }, key: index })
+      })
+    )
   }
 
-  mounted() {
-    setInterval(() => {
-      this.temperatureSettings.percent = Math.floor(Math.random() * 20)
-    }, 2000)
-  }
+  // mounted() {
+  //   setInterval(() => {
+  //     this.temperatureSettings.percent = Math.floor(Math.random() * 20)
+  //   }, 2000)
+  // }
 }

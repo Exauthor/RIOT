@@ -9,7 +9,7 @@ export interface IWidgetBlockGeneralSettings {
   breakpoints: Array<number[]>
 }
 
-export interface ChartPieSetting {
+export interface IChartPieSetting {
   percent: number
   text?: string
   title?: string
