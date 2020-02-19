@@ -45,10 +45,4 @@ export default class extends Vue {
       })
     )
   }
-
-  // mounted() {
-  //   setInterval(() => {
-  //     this.temperatureSettings.percent = Math.floor(Math.random() * 20)
-  //   }, 2000)
-  // }
 }

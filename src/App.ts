@@ -13,14 +13,15 @@ import { CreateElement, VNode } from 'vue/types'
   }
 })
 export default class extends Vue {
+  get layout() {
+    return PageModule.layout
+  }
+
   render(h: CreateElement): VNode {
     return h('component', { is: this.layout + 'Layout', attrs: { id: 'app' } }, [h('router-view')])
   }
-  get os() {
-    return SystemModule.os
-  }
 
-  get layout() {
-    return PageModule.layout
+  mounted() {
+    SystemModule.fetchSystemSettings()
   }
 }

@@ -25,8 +25,10 @@ class Settings extends VuexModule implements SettingsState {
         view: 'chartPie',
         chartSettings: {
           view: 'small',
-          value: 0,
-          percent: 0
+          percent: {
+            module: 'system',
+            id: 'temperature-cpu'
+          }
         }
       }
     },
@@ -35,6 +37,24 @@ class Settings extends VuexModule implements SettingsState {
       component: 'CryptoWidget',
       settings: {
         size: [4, 1]
+      }
+    },
+    {
+      title: 'Settings',
+      component: 'SettingsWidget',
+      settings: {
+        size: [1, 1],
+        view: 'chartPie',
+        chartSettings: {
+          value: 4200,
+          percent: {
+            module: 'system',
+            id: 'system-ram'
+          },
+          pre: 'Mb',
+          color: 'var(--color-active)',
+          title: 'Memory'
+        }
       }
     }
   ]
@@ -57,6 +77,7 @@ class Settings extends VuexModule implements SettingsState {
       ]
     }
   ]
+
   get getWidgetSettings() {
     return (title: string): IWidgetBlockGeneralSettings | undefined => {
       return this.widgetBlockGeneralSettings.find((settings) => settings.title === title)
