@@ -1,18 +1,25 @@
 import { execSync } from 'child_process'
 import { Response, Request } from 'express'
-import { getMemory } from '../services/system'
+import { getMemory, getCpuTemperature } from '../services/system'
 let express = require('express')
 let http = require('http')
 let path = require('path')
 let router = express.Router()
 
 router.get('/', async(req: Request, res: Response) => {
-  let answer = { memory: getMemory() }
+  let answer = {
+    memory: getMemory(),
+    cpuTemperature: getCpuTemperature()
+  }
   res.status(200).send(answer)
 })
 
 router.get('/memory', (req: Request, res: Response) => {
   res.json(getMemory())
+})
+
+router.get('/cpu-temperature', (req: Request, res: Response) => {
+  res.json(getCpuTemperature())
 })
 
 router.post('/cpu-up', (req: Request, res: Response) => {
