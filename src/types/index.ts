@@ -16,18 +16,23 @@ export interface IWidgetBlockGeneralSettings {
 export interface ISystemBlock {
   id: string,
   title: string,
-  value: number
-  minValue?: number,
-  maxValue?: number
+  value: IValueInterface
 }
 export interface IChartPieSetting {
-  percent: number | ModulePath
+  value: IValueInterface
+  computeValue?: Function,
   text?: string
   title?: string
   pre?: string
-  value?: number
   color?: string
   transition?: number
+}
+
+export interface IValueInterface {
+  id?: string,
+  current: number,
+  min?: number,
+  max?: number
 }
 
 export interface ModulePath {

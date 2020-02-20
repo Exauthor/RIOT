@@ -22,6 +22,7 @@ export default class extends Vue {
   }
 
   mounted() {
-    SystemModule.fetchSystemSettings()
+    // SystemModule.fetchSystemSettings()
+    SystemModule.getSystemInfo()
   }
 }

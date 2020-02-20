@@ -17,7 +17,9 @@ export default class extends Vue {
         size: [3, 3],
         view: 'chartPie',
         chartSettings: {
-          percent: 0
+          value: {
+            current: 22
+          }
         }
       }
     },
@@ -28,8 +30,10 @@ export default class extends Vue {
         size: [3, 3],
         view: 'chartPie',
         chartSettings: {
-          percent: 0,
-          value: 4200,
+          value: {
+            current: 4200,
+            max: 16000
+          },
           pre: 'Mb',
           color: 'var(--color-active)',
           title: 'Memory'

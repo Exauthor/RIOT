@@ -12,30 +12,21 @@ export default class ChartPie extends Vue {
   @Prop({ type: Object, required: true }) settings!: IChartPieSetting
 
   get infoBlock() {
-    if (typeof this.settings.percent === 'object') {
-      return SystemModule.getSystemInfoBlock(this.settings.percent.id)
+    if (this.settings.value.id) {
+      return SystemModule.getSystemInfoBlock(this.settings.value.id)
     }
     return false
   }
 
   get percent() {
-    const percent = this.settings.percent
-    if (typeof percent === 'object') {
-      const { maxValue, minValue } = this.infoBlock
-      const onePercent = ((maxValue || 100) - (minValue || 0)) / 100
-      return this.infoBlock.value / onePercent
-    } else {
-      return percent
-    }
+    const { current, min, max } = this.infoBlock ? this.infoBlock.value : this.settings.value
+    const onePercent = ((max || 100) - (min || 0)) / 100
+    return current / onePercent
   }
 
   get value() {
-    const value = this.settings.value
-    if (typeof value === 'object') {
-      return this.infoBlock && this.infoBlock.value
-    } else {
-      return value
-    }
+    const handle: Function = this.settings.computeValue || ((value: number) => value)
+    return this.infoBlock ? handle(this.infoBlock.value.current) : handle(this.settings.value.current)
   }
 
   render(h: CreateElement): VNode {
@@ -103,6 +94,9 @@ export default class ChartPie extends Vue {
     text.attr('style', `fill: ${color}; font-size: 1.5rem`)
 
     const animation = (transition: any, percent: number, oldValue: number) => {
+      if (percent === oldValue) {
+        return
+      }
       transition.attrTween('d', (d: any) => {
         let newAngle = (range(percent) / 100) * (2 * Math.PI)
         let interpolate = d3.interpolate(d.endAngle, newAngle)

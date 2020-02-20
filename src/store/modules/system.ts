@@ -1,6 +1,7 @@
 import { Module, VuexModule, Mutation, getModule, Action } from 'vuex-module-decorators'
-import { ISystemBlock } from '@/types'
+import { ISystemBlock, IValueInterface } from '@/types'
 import store from '../index'
+import axios from 'axios'
 
 export interface SystemState {
   os: string,
@@ -19,14 +20,16 @@ export class System extends VuexModule implements SystemState {
     {
       id: 'temperature-cpu',
       title: 'Temp cpu',
-      value: 50
+      value: {
+        current: 0
+      }
     },
     {
       id: 'system-ram',
       title: 'RAM',
-      value: 2100,
-      maxValue: 16000,
-      minValue: 0
+      value: {
+        current: 0
+      }
     }
   ]
 
@@ -41,12 +44,23 @@ export class System extends VuexModule implements SystemState {
   }
 
   @Action
+  async getSystemInfo() {
+    const info: any = await axios.get('http://localhost:3000/system')
+    const updateBlock = (id: string, value: IValueInterface) => this.updateSystemInfoBlock({ id, body: { value } })
+
+    updateBlock('temperature-cpu', { current: info.data.cpuTemperature.temperature })
+    updateBlock('system-ram', { current: info.data.memory.usedMemory, max: info.data.memory.totalMemory })
+  }
+
+  @Action
   async fetchSystemSettings() {
     setInterval(() => {
       this.updateSystemInfoBlock({
         id: 'temperature-cpu',
         body: {
-          value: Math.floor(Math.random() * 100)
+          value: {
+            current: Math.floor(Math.random() * 100)
+          }
         }
       })
     }, 3000)

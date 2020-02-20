@@ -1,9 +1,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
 import { CryptoModule } from '@/store/modules/crypto'
-import { WidgetBlockGeneralSettings } from '@/types'
 import { CreateElement, VNode } from 'vue/types'
-import axios from 'axios'
 
 @Component({
   name: 'CryptoWidget'
@@ -40,7 +38,7 @@ export default class CryptoWidget extends Vue {
     return CryptoModule.getCoinsSequence()
   }
 
-  get generallWidgetSettings(): WidgetBlockGeneralSettings | undefined {
+  get generalWidgetSettings() {
     return SettingsModule.getWidgetSettings('Crypto')
   }
 

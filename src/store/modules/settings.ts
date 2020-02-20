@@ -25,9 +25,10 @@ class Settings extends VuexModule implements SettingsState {
         view: 'chartPie',
         chartSettings: {
           view: 'small',
-          percent: {
+          value: {
             module: 'system',
-            id: 'temperature-cpu'
+            id: 'temperature-cpu',
+            current: 12
           }
         }
       }
@@ -46,11 +47,12 @@ class Settings extends VuexModule implements SettingsState {
         size: [1, 1],
         view: 'chartPie',
         chartSettings: {
-          value: 4200,
-          percent: {
+          value: {
             module: 'system',
-            id: 'system-ram'
+            id: 'system-ram',
+            current: 0
           },
+          computeValue: (value: number) => value / 1024,
           pre: 'Mb',
           color: 'var(--color-active)',
           title: 'Memory'
