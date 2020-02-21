@@ -14,3 +14,14 @@ export const getCpuTemperature = function() {
 
   return { temperature }
 }
+
+export const getCurrentVolume = function() {
+  const volume = parseFloat(execSync(`awk -F"[][]" '/dB/ { print $2 }' <(amixer sget Master)`).toString('utf8'))
+
+  return { volume }
+}
+
+export const updateVolume = function(volume: number) {
+  const volumeAnswer = parseFloat(execSync(`awk -F"[][]" '/dB/ { print $2 }' <(amixer set Master ${volume}%)`).toString('utf8'))
+  return volumeAnswer
+}
