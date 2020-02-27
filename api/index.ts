@@ -4,6 +4,9 @@ import cors from 'cors'
 import http from 'http'
 import router from './controllers/index'
 import routerSystem from './controllers/system'
+import routerMpd, { MPDSocket } from './controllers/mpd'
+import WebSocket from 'ws'
+var wsApp = new MPDSocket()
 
 require('dotenv').config()
 
@@ -22,8 +25,15 @@ app.use(bodyParser.urlencoded({
 const server = http.createServer(app)
 
 app.set('port', process.env.PORT || 3000)
+
 app.use('/', router)
 app.use('/system', routerSystem)
+app.use('/mpd', routerMpd)
+
+const wss = new WebSocket.Server({ server })
+wsApp.init(wss)
+
+// MPDSocket
 
 server.listen(app.get('port'), () => console.log('Express server listening on port ' + app.get('port')))
 server.on('error', utils.onError)
