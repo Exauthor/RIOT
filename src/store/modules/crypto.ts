@@ -15,14 +15,14 @@ class Crypto extends VuexModule implements CryptoStage {
 
   get getCoinsSequence() {
     return (sequence?: string[] | undefined): Array<Coin> => {
-      sequence = sequence || []
-      sequence = sequence.length ? sequence : this.coinsDefaultSequence
-      return this.coins.filter((coin: Coin) => sequence.includes(coin.id))
+      let innerSequence = sequence || this.coinsDefaultSequence
+      innerSequence = innerSequence.length ? innerSequence : this.coinsDefaultSequence
+      return this.coins.filter((coin: Coin) => innerSequence.includes(coin.id))
     }
   }
 
   @Mutation
-  SET_CRYPTO_STATE(change: { key: string, value: any}) {
+  SET_CRYPTO_STATE(change: { key: string, value: any }) {
     (this as any)[change.key] = change.value
   }
 
