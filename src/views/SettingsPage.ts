@@ -1,9 +1,10 @@
 import { Component, Vue } from 'vue-property-decorator'
-// import ChartPie from '@/components/block/ChartPie.ts'
 import { IChartPieSetting, IWidgetBlock } from '@/types'
 import { CreateElement, VNode } from 'vue/types'
 
-import WidgetBlock from '@/components/block/widget/index.ts'
+import { UtilsModule } from '@/store/modules/utils'
+
+import WidgetBlock from '@/components/block/widget/BlockWidget'
 
 @Component({
   name: 'SettingsPage'
@@ -11,33 +12,31 @@ import WidgetBlock from '@/components/block/widget/index.ts'
 export default class extends Vue {
   settingsBlocks: Array<IWidgetBlock> = [
     {
-      title: 'Settings',
+      id: UtilsModule.getUUID(),
+      title: 'RAM Computer',
       component: 'SettingsWidget',
-      settings: {
-        size: [3, 3],
-        view: 'chartPie',
-        chartSettings: {
-          value: {
-            current: 22
-          }
+      size: [3, 3],
+      view: 'chartPie',
+      chartSettings: {
+        value: {
+          current: 22
         }
       }
     },
     {
-      title: 'Settings',
+      id: UtilsModule.getUUID(),
+      title: 'Temperature CPU Computer',
       component: 'SettingsWidget',
-      settings: {
-        size: [3, 3],
-        view: 'chartPie',
-        chartSettings: {
-          value: {
-            current: 4200,
-            max: 16000
-          },
-          pre: 'Mb',
-          color: 'var(--color-active)',
-          title: 'Memory'
-        }
+      size: [3, 3],
+      view: 'chartPie',
+      chartSettings: {
+        value: {
+          current: 4200,
+          max: 16000
+        },
+        pre: 'Mb',
+        color: 'var(--color-active)',
+        title: 'Memory'
       }
     }
   ]

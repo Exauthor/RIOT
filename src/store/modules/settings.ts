@@ -1,6 +1,7 @@
 import { Module, VuexModule, getModule } from 'vuex-module-decorators'
 import store from '@/store'
 import { IWidgetBlock, IWidgetBlockGeneralSettings } from '@/types'
+import { UtilsModule } from '@/store/modules/utils'
 
 export interface SettingsState {
   widgetBlocks: Array<IWidgetBlock>
@@ -11,53 +12,58 @@ export interface SettingsState {
 class Settings extends VuexModule implements SettingsState {
   widgetBlocks = [
     {
-      title: 'MDP',
+      id: UtilsModule.getUUID(),
+      title: 'MDP Server',
+      widget: 'MDP',
       component: 'MpdWidget',
-      settings: {
-        size: [4, 1]
-      }
+      size: [4, 1]
     },
     {
-      title: 'Settings',
+      id: UtilsModule.getUUID(),
+      title: 'Temperature CPU',
       component: 'SettingsWidget',
-      settings: {
-        size: [1, 1],
-        view: 'chartPie',
-        chartSettings: {
-          view: 'small',
-          value: {
-            module: 'system',
-            id: 'temperature-cpu',
-            current: 12
-          }
+      url: '/settings',
+      size: [1, 1],
+      view: 'chartPie',
+      chartSettings: {
+        view: 'small',
+        value: {
+          module: 'system',
+          id: 'temperature-cpu',
+          current: 12
         }
       }
     },
     {
-      title: 'Crypto',
+      id: UtilsModule.getUUID(),
+      title: 'Crypto info',
       component: 'CryptoWidget',
-      settings: {
-        size: [4, 1]
+      size: [4, 1]
+    },
+    {
+      id: UtilsModule.getUUID(),
+      title: 'RAM Amount',
+      component: 'SettingsWidget',
+      url: '/settings',
+      size: [1, 1],
+      view: 'chartPie',
+      chartSettings: {
+        value: {
+          module: 'system',
+          id: 'system-ram',
+          current: 0
+        },
+        computeValue: (value: number) => value / 1024,
+        pre: 'Mb',
+        color: 'var(--color-active)',
+        title: 'Memory'
       }
     },
     {
-      title: 'Settings',
-      component: 'SettingsWidget',
-      settings: {
-        size: [1, 1],
-        view: 'chartPie',
-        chartSettings: {
-          value: {
-            module: 'system',
-            id: 'system-ram',
-            current: 0
-          },
-          computeValue: (value: number) => value / 1024,
-          pre: 'Mb',
-          color: 'var(--color-active)',
-          title: 'Memory'
-        }
-      }
+      id: UtilsModule.getUUID(),
+      title: 'Audio reset',
+      component: 'AudioWidget',
+      size: [3, 1]
     }
   ]
 
