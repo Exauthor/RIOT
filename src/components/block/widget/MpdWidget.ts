@@ -2,7 +2,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CreateElement, VNode } from 'vue/types'
 
 @Component({
-  name: 'CryptoWidget'
+  name: 'WidgetMpd'
 })
 export default class extends Vue {
   @Prop() settings!: any;

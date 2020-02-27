@@ -4,7 +4,7 @@ import { CryptoModule } from '@/store/modules/crypto'
 import { CreateElement, VNode } from 'vue/types'
 
 @Component({
-  name: 'CryptoWidget'
+  name: 'WidgetCrypto'
 })
 export default class CryptoWidget extends Vue {
   @Prop({ required: true, type: Object }) readonly settings!: any;
