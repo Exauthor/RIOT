@@ -1,12 +1,13 @@
 export interface IWidgetBlock {
+  id: string
   title: string
-  component: string
-  settings: {
-    size: number[]
-    chartSettings?: IChartPieSetting
-    view?: string
-  }
+  about?: string
   url?: string
+  component: string
+  size: number[]
+  chartSettings?: IChartPieSetting
+  view?: string
+  color?: string
 }
 
 export interface IWidgetBlockGeneralSettings {
@@ -14,13 +15,13 @@ export interface IWidgetBlockGeneralSettings {
 }
 
 export interface ISystemBlock {
-  id: string,
-  title: string,
+  id: string
+  title: string
   value: IValueInterface
 }
 export interface IChartPieSetting {
   value: IValueInterface
-  computeValue?: Function,
+  computeValue?: Function
   text?: string
   title?: string
   pre?: string
@@ -29,13 +30,28 @@ export interface IChartPieSetting {
 }
 
 export interface IValueInterface {
-  id?: string,
-  current: number,
-  min?: number,
+  id?: string
+  current: number
+  min?: number
   max?: number
 }
 
 export interface ModulePath {
-  module: string,
+  module: string
   id?: string
+}
+
+export interface IActiveBlock {
+  id: string
+  title?: string
+  children?: Array<IActiveBlock>
+  onMount?: Array<IAction>
+  onDestroy?: Array<IAction>
+}
+
+export interface IAction {
+  path: string
+  on: string
+  type?: string
+  structure?: string
 }
