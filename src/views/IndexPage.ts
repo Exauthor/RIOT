@@ -1,6 +1,6 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { SettingsModule } from '@/store/modules/settings'
-import WidgetBlock from '@/components/block/widget/index.ts'
+import WidgetBlock from '@/components/block/widget/BlockWidget'
 import { CreateElement, VNode } from 'vue/types'
 
 @Component({

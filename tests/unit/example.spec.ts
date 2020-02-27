@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils'
-import MPD from '@/components/block/widget/mpd'
+import MPD from '@/components/block/widget/MpdWidget'
 
 describe('MpdWidget.vue', () => {
   it('renders text widget', () => {
