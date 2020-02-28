@@ -7,11 +7,16 @@ import { CreateElement, VNode } from 'vue/types'
 export default class extends Vue {
   @Prop() settings!: any;
 
+  record: boolean = false
+
   render(h: CreateElement): VNode {
     return h('div', ['AudioWidget'])
   }
 
   mounted() {
+    if (!this.record) {
+      return
+    }
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
         const mediaRecorder = new MediaRecorder(stream)

@@ -23,7 +23,6 @@ export default class extends Vue {
   @Prop({ type: Boolean, default: false }) needRedirect!: boolean;
 
   render(h: CreateElement): VNode {
-    console.log('render', this.block.component)
     let child: VNode | string
     child = h('component', {
       is: this.block.component,

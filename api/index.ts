@@ -6,7 +6,7 @@ import router from './controllers/index'
 import routerSystem from './controllers/system'
 import routerMpd, { MPDSocket } from './controllers/mpd'
 import WebSocket from 'ws'
-var wsApp = new MPDSocket()
+const wsApp = new MPDSocket()
 
 require('dotenv').config()
 

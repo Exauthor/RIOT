@@ -1,0 +1,76 @@
+.mpd-block
+  padding 6px
+  height 100%
+
+.mpd-block
+  display flex
+  align-items center
+
+.mpd-block__body
+  width 75%
+  height 100%
+
+.mpd-block__music
+  width 25%
+  height 100%
+  border-left 1px solid var(--color-active)
+
+.mpd-block__header-interface
+  padding 0 6px 6px
+  border-bottom 1px solid var(--color-active)
+  display flex
+  justify-content space-between
+
+.mpd-block__icon
+  min-width 3.5vmin
+  min-height 3.5vmin
+  position relative
+
+.mpd-block__icon--arrow, .mpd-block__icon--play
+  &::before
+    top 7.5%
+  &::before, &::after
+    transition .3s
+    right 50%
+    content ''
+    display block
+    width 1px
+    height 50%
+    background currentColor
+    position absolute
+    transform-origin 100% 50%
+    transform translateX(-50%) rotate(-45deg)
+  &::after
+    bottom 7.5%
+    transform-origin 0% 50%
+    transform translateX(-50%) rotate(45deg)
+    
+.mpd-block__icon--play
+  &:hover
+    &::before, &::after
+      height 42%
+      transform translateX(1vmin) rotate(0deg)
+
+.mpd-block__icon--play-line
+  width 1px
+  height: 75%
+  position absolute
+  background currentColor
+  left 27%
+  display block
+  top 50%
+  transform translateY(-50%)
+
+.mpd-block__icon--arrow--prev
+  transform scaleX(-1)
+
+.mpd-block__icon--repeat
+  position relative
+  &::before
+    content ''
+    display block
+    width 80%
+    height 80%
+    border 1px solid currentColor
+    border-radius 50%
+    center()
