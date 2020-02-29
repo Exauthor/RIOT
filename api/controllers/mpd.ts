@@ -21,28 +21,35 @@ router.get('/', async(req: Request, res: Response) => {
   res.status(200).send(answer)
 })
 
-router.get('/connect', async(req: Request, res: Response) => {
-  res.status(200).send(true)
+router.get('/command', async(req: Request, res: Response) => {
+  try {
+    const answer = await mpdClient.sendCommands(req.body.commands, null, true, true)
+    res.status(200).send(answer)
+  } catch (error) {
+    res.status(400).send(error)
+  }
 })
 
-router.get('/command', async(req: Request, res: Response) => {
-  console.log(req.body.commands, 'commands')
-  mpdClient.sendCommands(req.body.commands, function(error: any, status: string) {
-    if (error) {
-      console.log('ERROR FROM MPD:', error)
-      res.status(400).send(error)
-      return
-    }
-    console.log('ANSWER FROM MPD:', status)
-    res.status(200).send(status)
-  }, true)
+router.get('/status', async(req: Request, res: Response) => {
+  const status = await mpdClient.getMpdStatus()
+  res.status(200).send(status)
+})
+
+router.get('/play', async(req: Request, res: Response) => {
+  const status = await mpdClient.play()
+  res.status(200).send(status)
+})
+
+router.get('/stop', async(req: Request, res: Response) => {
+  const status = await mpdClient.pause()
+  res.status(200).send(status)
 })
 
 export class MPDSocket {
   init(wss: any) {
     let self = this
     wss.on('connection', function connection(ws: any, req: any) {
-      ws.on('message', function incoming(message: string) {
+      ws.on('message', async function incoming(message: string) {
         let msg: any = JSON.parse(message)
         try {
           msg = JSON.parse(message)
@@ -60,29 +67,10 @@ export class MPDSocket {
             console.log('START WITH SOCKET')
             self.sendWSSMessage(ws, 'STATION_LIST IS EMPTY', null)
             break
-            // fs.readFile(stationFile, 'utf8', function(err, data) {
-            //   if (err) {
-            //     console.error('Can\'t read station file: "' + stationFile + '": ' + err)
-            //     return
-            //   }
-            //   try {
-            //     var stationList = JSON.parse(data)
-            //     if (!Array.isArray(stationList)) { throw 'Station list is not an array' }
-            //     sendWSSMessage(ws, 'STATION_LIST', stationList)
-            //   } catch (error) {
-            //     console.error('Can\'t interpret station file: "' + stationFile + '": ' + error)
-            //   }
-            // })
-            // break
 
-          case 'REQUEST_STATUS':
-            mpdClient.getMpdStatus(function(error: any, status: any) {
-              if (error) {
-                self.sendWSSMessage(ws, 'MPD_OFFLINE', null)
-              } else {
-                self.sendWSSMessage(ws, 'STATUS', status)
-              }
-            })
+          case 'STATUS':
+            const status = await mpdClient.getMpdStatus()
+            self.sendWSSMessage(ws, 'STATUS', status)
             break
 
           case 'REQUEST_ELAPSED':
@@ -103,28 +91,21 @@ export class MPDSocket {
                 }
               })
             } else {
-              mpdClient.play(function(error: any) {
-                if (error) {
-                  self.sendWSSMessage(ws, 'MPD_OFFLINE')
-                }
-              })
+              mpdClient.play()
             }
             break
 
           case 'PAUSE':
-            mpdClient.pause(function(error: any) {
-              if (error) {
-                self.sendWSSMessage(ws, 'MPD_OFFLINE')
-              }
-            })
+            mpdClient.pause()
             break
           default:
+            self.sendWSSMessage(ws, 'WRONG COMMAND')
         }
       })
     })
 
     mpdClient.onStatusChange(function(status: string) {
-      console.log('UPDATE SOCKER VALUES')
+      console.log('UPDATE SOCKER VALUES', status)
       self.broadcastMessage(wss, 'STATUS', status)
     })
   }

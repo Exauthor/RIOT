@@ -36,7 +36,7 @@ export default class extends Vue {
   ]
 
   render(h: CreateElement): VNode {
-    if (this.mpdInfo.title) {
+    if (this.mpdInfo.file) {
       return h('div', { class: 'mpd-block' },
         [
           h('div', { class: 'mpd-block__body' }, [
@@ -60,7 +60,7 @@ export default class extends Vue {
         ]
       )
     }
-    return h('div', ['MPD'])
+    return h('div', ['MPD not connected'])
   }
 
   nextTrack() {

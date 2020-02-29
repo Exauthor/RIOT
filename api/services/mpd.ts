@@ -3,27 +3,26 @@ var mpd = require('mpd')
 var cmd = mpd.cmd
 var debug = require('debug')('mpd.fm:mpdclient')
 
-interface ISetupMPDServer {
+interface IMPDConnection {
   port: string
   host: string
 }
 
 interface IAdditionalSetupMPDServer {
   mpdClient: any
-  mpdStatus: number
 }
 
 // Private
 var Status = Object.freeze({ 'disconnected': 1, 'connecting': 2, 'reconnecting': 3, 'ready': 4 })
 var updateClients: any = []
 
-export class MPD implements ISetupMPDServer, IAdditionalSetupMPDServer {
+export class MPD implements IAdditionalSetupMPDServer {
   mpdClient: any = null
-  mpdStatus: number = Status.disconnected
-  port: string
-  host: string
+  private status: number = Status.disconnected
+  private port: string
+  private host: string
 
-  constructor(options: ISetupMPDServer) {
+  constructor(options: IMPDConnection) {
     this.port = options.port
     this.host = options.host
     this.connect()
@@ -36,23 +35,19 @@ export class MPD implements ISetupMPDServer, IAdditionalSetupMPDServer {
       this.mpdClient = null
     }
 
-    this.mpdStatus = Status.connecting
+    this.status = Status.connecting
     debug('Connecting')
     this.mpdClient = mpd.connect({ port: this.port, host: this.host })
 
     this.mpdClient.on('ready', function() {
       console.log('MPD client ready and connected to ' + self.host + ':' + self.port)
 
-      self.mpdStatus = Status.ready
+      self.status = Status.ready
       self.mpdClient.on('system', function(name: string) {
         debug('System update received: ' + name)
         if (name === 'playlist' || name === 'player') {
-          self.sendStatusRequest(function(error: any, status: string) {
-            if (!error) {
-              updateClients.forEach(function(callback: Function) {
-                callback(status)
-              })
-            }
+          self.sendStatusRequest(function(error: Error, status: string) {
+            if (!error) updateClients.forEach((callback: Function) => callback(mpd.parseKeyValueMessage(status)))
           })
         }
       })
@@ -70,53 +65,46 @@ export class MPD implements ISetupMPDServer, IAdditionalSetupMPDServer {
   }
 
   retryConnect() {
-    if (this.mpdStatus === Status.reconnecting) { return }
+    if (this.status === Status.reconnecting) { return }
     this.mpdClient = null
-    this.mpdStatus = Status.reconnecting
+    this.status = Status.reconnecting
     setTimeout(() => {
       this.connect()
     }, 3000)
   }
 
-  sendStatusRequest(callback: any) {
-    this.sendCommands([ cmd('currentsong', []), cmd('status', []) ],
-      function(error: any, message: any) {
-        if (error) {
-          callback(error)
-        } else {
-          var status = mpd.parseKeyValueMessage(message)
-          callback(null, status)
-        }
-      })
+  sendStatusRequest(callback?: Function) {
+    return this.sendCommands([['currentsong', []], ['status', []]], callback || null, true, true)
   }
 
-  sendCommands(commands: Array<any>, callback: Function, wrapCommand: Boolean = false) {
-    if (wrapCommand) {
-      commands = commands.map(command => cmd(command[0], command[1]))
+  defaultCallback(resolve: Function, reject: Function, computedFunction?: Function) {
+    return (error: Error, message: string) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve(computedFunction ? computedFunction(message) : message)
+      }
     }
-    console.log(commands, 'sendCommands commands')
-    try {
-      if (this.mpdStatus !== Status.ready) {
-        callback('Not connected')
-      }
+  }
 
-      var callbackInherit = function(error: any, message: any) {
-        if (error) {
-          console.error(error)
-          callback(error)
-        } else {
-          callback(null, message)
-        }
-      }
+  sendCommands(commands: Array<any>, callback: Function | null, wrapCommand: Boolean = true, parse: Boolean = true) {
+    return new Promise((resolve, reject) => {
+      commands = wrapCommand ? commands.map(command => cmd(command[0], command[1])) : commands
+      console.log(commands, 'sendCommands commands')
+
+      if (this.status !== Status.ready) reject(Error('Not connected'))
+
+      const callbackInherit = callback || this.defaultCallback(resolve, reject, parse ? mpd.parseKeyValueMessage : null)
+
+      // const finalFunction = Array.isArray(commands) ? this.mpdClient.sendCommands : this.mpdClient.sendCommand
+      // this.mpdClient.sendCommands(commands, callbackInherit)
 
       if (Array.isArray(commands)) {
         this.mpdClient.sendCommands(commands, callbackInherit)
       } else {
         this.mpdClient.sendCommand(commands, callbackInherit)
       }
-    } catch (error) {
-      callback(error)
-    }
+    })
   }
 
   sendElapsedRequest(callback: Function) {
@@ -138,25 +126,11 @@ export class MPD implements ISetupMPDServer, IAdditionalSetupMPDServer {
       })
   }
 
-  sendPlay(play: any, callback: any) {
-    var command = 'play'
-    var arg: any = []
-    if (!play) {
-      command = 'pause'
-      arg = [1]
-    }
-
-    this.sendCommands(cmd(command, arg),
-      function(err: any, msg: any) {
-        if (err) {
-          callback(err)
-        } else {
-          callback(null)
-        }
-      })
+  setPlay(command: [string, Array<number>]) {
+    return this.sendCommands([command], null, true)
   }
 
-  sendPlayStation(stream: any, callback: any) {
+  setPlayStation(stream: any, callback: any) {
     this.sendCommands([cmd('clear', []), cmd('repeat', [1]), cmd('add', [stream]), cmd('play', []) ],
       function(err: any, msg: string) {
         if (err) {
@@ -166,50 +140,31 @@ export class MPD implements ISetupMPDServer, IAdditionalSetupMPDServer {
         }
       })
   }
-
-  checkCommandAction(commands: [string, Array<number>]) {
-    return this.sendCommands([cmd(commands)], (error: any, message: any) => {
-      if (error) {
-        console.log('MPD ERROR: ', error)
-        return error
-      }
-      console.log('MPD MESSAGE:', message)
-      return message
-    })
-  }
 }
 
 export class MDPService extends MPD {
-  setup(options?: ISetupMPDServer) {
-    if (options) {
-      this.port = options.port
-      this.host = options.host
-    }
-    this.connect()
-  }
-
   onStatusChange(callback: Function) {
     updateClients.push(callback)
   }
 
-  getMpdStatus(callback: Function) {
-    this.sendStatusRequest(callback)
+  getMpdStatus() {
+    return this.sendStatusRequest()
   }
 
   getElapsed(callback: Function) {
-    this.sendElapsedRequest(callback)
+    return this.sendElapsedRequest(callback)
   }
 
-  play(callback: Function) {
-    this.sendPlay(true, callback)
+  play() {
+    return this.setPlay(['pause', []])
   }
 
-  pause(callback: Function) {
-    this.sendPlay(false, callback)
+  pause() {
+    return this.setPlay(['pause', [1]])
   }
 
   playStation(stream: any, callback: Function) {
     debug('play ' + stream)
-    this.sendPlayStation(stream, callback)
+    return this.setPlayStation(stream, callback)
   }
 }
