@@ -1,5 +1,6 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CreateElement, VNode } from 'vue/types'
+import ChartBar from '@/components/block/ChartBar.ts'
 
 @Component({
   name: 'WidgetMpd'
@@ -10,7 +11,7 @@ export default class extends Vue {
   record: boolean = false
 
   render(h: CreateElement): VNode {
-    return h('div', ['AudioWidget'])
+    return h(ChartBar, { props: { settings: { value: [1, 2, 3, 4] } } })
   }
 
   mounted() {
