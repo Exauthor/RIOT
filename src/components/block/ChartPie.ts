@@ -8,7 +8,6 @@ import * as d3 from 'd3'
   name: 'ChartPie'
 })
 export default class ChartPie extends Vue {
-  @Prop({ default: 'temperature', type: String }) option!: string
   @Prop({ type: Object, required: true }) settings!: IChartPieSetting
 
   get infoBlock() {
@@ -114,7 +113,7 @@ export default class ChartPie extends Vue {
       })
     }
 
-    let animate = async function() {
+    let animate = () => {
       path.transition()
         .duration(1200)
         .ease(d3.easeLinear)

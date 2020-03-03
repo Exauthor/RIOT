@@ -55,3 +55,15 @@ export interface IAction {
   type?: string
   structure?: string
 }
+
+export interface IEventAction {
+  function: Function,
+  arguments?: Array<any>
+}
+
+export interface IMpdHeaderInterface {
+  icon: string
+  class: string
+  innerHTML?: string
+  actions: IEventAction
+}
