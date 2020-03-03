@@ -1,10 +1,10 @@
 import { Response, Request } from 'express'
 import { MDPService } from '../services/mpd'
 
-let fs = require('fs')
-let path = require('path')
+import fs from 'fs'
+import path from 'path'
+import * as WebSocket from 'ws'
 let debug = require('debug')('mpd.fm:wss')
-const WebSocket = require('ws')
 
 const MPD_PORT = (process.env as any).MPD_PORT || '6600'
 const MPD_HOST = process.env.MPD_HOST || 'localhost'
@@ -46,11 +46,11 @@ router.get('/stop', async(req: Request, res: Response) => {
 })
 
 export class MPDSocket {
-  init(wss: any) {
+  init(wss: WebSocket) {
     let self = this
-    wss.on('connection', function connection(ws: any, req: any) {
+    wss.on('connection', (ws: WebSocket) => {
       ws.on('message', async function incoming(message: string) {
-        let msg: any = JSON.parse(message)
+        let msg: any
         try {
           msg = JSON.parse(message)
         } catch {
@@ -59,16 +59,18 @@ export class MPDSocket {
 
         debug('Received %s with %o', msg.type, msg.data)
         switch (msg.type) {
-          case 'REQUEST_TRACK_LIST':
-            console.log('START WITH SOCKET')
-            self.sendWSSMessage(ws, 'STATION_LIST IS EMPTY', null)
-            break
           case 'REQUEST_STATION_LIST':
-            console.log('START WITH SOCKET')
             self.sendWSSMessage(ws, 'STATION_LIST IS EMPTY', null)
             break
 
+          case 'PLAYLIST':
+            // eslint-disable-next-line no-case-declarations
+            const playlists = await mpdClient.sendCommands([['playlist', []]])
+            self.sendWSSMessage(ws, 'PLAYLIST', playlists)
+            break
+
           case 'STATUS':
+            // eslint-disable-next-line no-case-declarations
             const status = await mpdClient.getMpdStatus()
             self.sendWSSMessage(ws, 'STATUS', status)
             break
@@ -83,12 +85,22 @@ export class MPDSocket {
             })
             break
 
+          case 'SET_TRACK':
+            await mpdClient.sendCommands([['playid', [msg.data]]])
+            break
+
+          case 'PREVIOUS':
+            await mpdClient.sendCommands([['previous', []]])
+            break
+
+          case 'NEXT':
+            await mpdClient.sendCommands([['next', []]])
+            break
+
           case 'PLAY':
             if (msg.data && msg.data.stream) {
-              mpdClient.playStation(msg.data.stream, function(error: any) {
-                if (error) {
-                  self.sendWSSMessage(ws, 'MPD_OFFLINE', null)
-                }
+              mpdClient.playStation(msg.data.stream, (error: Error) => {
+                if (error) self.sendWSSMessage(ws, 'MPD_OFFLINE')
               })
             } else {
               mpdClient.play()
@@ -104,29 +116,24 @@ export class MPDSocket {
       })
     })
 
-    mpdClient.onStatusChange(function(status: string) {
-      console.log('UPDATE SOCKER VALUES', status)
-      self.broadcastMessage(wss, 'STATUS', status)
-    })
+    mpdClient.onStatusChange((status: string) => self.broadcastMessage(wss, 'STATUS', status))
   }
 
-  sendWSSMessage(client: any, type: any, data?: any, showDebug = true) {
+  sendWSSMessage(client: WebSocket, type: string, data?: any, showDebug = true) {
     data = this.objectToLowerCase(data)
     showDebug && debug('Send: ' + type + ' with %o', data)
-    var msg = {
-      type: type,
+    let payload = {
+      type,
       data: (data) || {}
     }
-    client.send(JSON.stringify(msg), function(error) {
-      if (error) { debug('Failed to send data to client %o', error) }
-    })
+    client.send(JSON.stringify(payload))
   }
 
-  broadcastMessage(server: any, type: any, data: any) {
+  broadcastMessage(server: WebSocket, type: string, data: any) {
     data = this.objectToLowerCase(data)
     const self = this
     debug('Broadcast: ' + type + ' with %o', data)
-    server.clients.forEach(function each(client: any) {
+    server.clients.forEach((client: WebSocket) => {
       if (client.readyState === WebSocket.OPEN) {
         self.sendWSSMessage(client, type, data, false)
       }

@@ -74,7 +74,7 @@ export class MPD implements IAdditionalSetupMPDServer {
   }
 
   sendStatusRequest(callback?: Function) {
-    return this.sendCommands([['currentsong', []], ['status', []]], callback || null, true, true)
+    return this.sendCommands([['currentsong', []], ['status', []]], callback || undefined)
   }
 
   defaultCallback(resolve: Function, reject: Function, computedFunction?: Function) {
@@ -87,17 +87,13 @@ export class MPD implements IAdditionalSetupMPDServer {
     }
   }
 
-  sendCommands(commands: Array<any>, callback: Function | null, wrapCommand: Boolean = true, parse: Boolean = true) {
+  sendCommands(commands: Array<any>, callback?: Function, wrapCommand: Boolean = true, parse: Boolean = true) {
     return new Promise((resolve, reject) => {
       commands = wrapCommand ? commands.map(command => cmd(command[0], command[1])) : commands
-      console.log(commands, 'sendCommands commands')
 
       if (this.status !== Status.ready) reject(Error('Not connected'))
 
       const callbackInherit = callback || this.defaultCallback(resolve, reject, parse ? mpd.parseKeyValueMessage : null)
-
-      // const finalFunction = Array.isArray(commands) ? this.mpdClient.sendCommands : this.mpdClient.sendCommand
-      // this.mpdClient.sendCommands(commands, callbackInherit)
 
       if (Array.isArray(commands)) {
         this.mpdClient.sendCommands(commands, callbackInherit)
@@ -127,7 +123,7 @@ export class MPD implements IAdditionalSetupMPDServer {
   }
 
   setPlay(command: [string, Array<number>]) {
-    return this.sendCommands([command], null, true)
+    return this.sendCommands([command], undefined, true)
   }
 
   setPlayStation(stream: any, callback: any) {
