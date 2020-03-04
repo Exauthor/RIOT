@@ -29,6 +29,12 @@ export interface IChartPieSetting {
   transition?: number
 }
 
+export interface IChartBarMusicSetting {
+  currentTime: number
+  allTime: number
+  data?: number[]
+}
+
 export interface IValueInterface {
   id?: string
   current: number
@@ -66,4 +72,31 @@ export interface IMpdHeaderInterface {
   class: string
   innerHTML?: string
   actions: IEventAction
+}
+
+export interface IMpdTrackStatus {
+  album: string
+  artist: string
+  audio: string
+  bitrate: string
+  consume: string
+  duration: string
+  elapsed: string
+  file: string
+  id: string
+  'last-modified': string
+  mixrampdb: string
+  nextsong: string
+  nextsongid: string
+  playlist: string
+  playlistlength: string
+  pos: string
+  random: string
+  repeat: string
+  single: string
+  song: string
+  songid: string
+  state: string
+  time: string
+  title: string
 }

@@ -1,6 +1,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CreateElement, VNode } from 'vue/types'
-import { IMpdHeaderInterface } from '@/types'
+import { IMpdHeaderInterface, IMpdTrackStatus } from '@/types'
+import ChartBar from '@/components/block/ChartBar.ts'
 
 @Component({
   name: 'WidgetMpd'
@@ -11,7 +12,9 @@ export default class extends Vue {
   socket: any
   wsUri: string = 'ws://localhost:3000'
   socketInfo: any = {}
-  mpdInfo: any = {}
+  mpdInfo: IMpdTrackStatus | null = null
+  intervalTimer: any = null
+  currentTime: number = 0
   tracks: any[] = [
     {
       title: 'Летов - всё как у людей'
@@ -30,7 +33,7 @@ export default class extends Vue {
     })
     mpdHeaderInterface.push({
       icon: 'play',
-      class: `mpd-block__icon mpd-block__icon--play ${this.mpdInfo.state === 'pause' && 'mpd-block__icon--play-stop'}`,
+      class: `mpd-block__icon mpd-block__icon--play ${this.mpdInfo && this.mpdInfo.state === 'pause' && 'mpd-block__icon--play-stop'}`,
       innerHTML: '<div class="mpd-block__icon--play-line"></div>',
       actions: {
         function: this.togglePlayTrack
@@ -56,6 +59,8 @@ export default class extends Vue {
   }
 
   get trackName(): string {
+    if (!this.mpdInfo) return 'Not a file'
+
     const { artist, title, file } = this.mpdInfo
     if (artist || title) {
       return `${this.mpdInfo.artist} - ${this.mpdInfo.title}`
@@ -65,12 +70,26 @@ export default class extends Vue {
   }
 
   render(h: CreateElement): VNode {
-    if (this.mpdInfo.file) {
+    if (this.mpdInfo && this.mpdInfo.file) {
       return h('div', { class: 'mpd-block' },
         [
           h('div', { class: 'mpd-block__body' }, [
             h('div', { class: 'mpd-block__header' }, [
               h('h4', { class: 'mpd-block__title' }, this.trackName)
+            ]),
+            h('div', { class: 'mpd-block__chart' }, [
+              h(ChartBar, {
+                key: this.trackName,
+                on: {
+                  updateTime: this.updateTime
+                },
+                props: {
+                  settings: {
+                    currentTime: this.currentTime,
+                    allTime: parseInt(this.mpdInfo.time.split(':')[1])
+                  }
+                }
+              })
             ])
           ]),
           h('div', { class: 'mpd-block__music' }, [
@@ -125,8 +144,19 @@ export default class extends Vue {
     console.log('Toggle repeat')
   }
 
-  togglePlayTrack(play?: boolean) {
-    this.sendCommand((play || this.mpdInfo.state) ? 'PLAY' : 'STOP')
+  updateTime(time: number) {
+    this.sendCommand('UPDATE_TIME', time)
+  }
+
+  async togglePlayTrack(play?: boolean) {
+    if (play || (this.mpdInfo && this.mpdInfo.state === 'pause')) {
+      clearInterval(this.intervalTimer)
+      this.intervalTimer = setInterval(() => this.currentTime++, 1000)
+      this.sendCommand('PLAY')
+    } else {
+      clearInterval(this.intervalTimer)
+      this.sendCommand('PAUSE')
+    }
   }
 
   sendCommand(command: string, arg?: any) {
@@ -148,6 +178,11 @@ export default class extends Vue {
       switch (answer.type) {
         case 'STATUS':
           self.mpdInfo = answer.data
+          self.currentTime = parseInt(answer.data.time.split(':')[0])
+          if (answer.data.state === 'play') {
+            clearInterval(self.intervalTimer)
+            self.intervalTimer = setInterval(() => self.currentTime++, 1000)
+          }
           break
         case 'PLAYLIST':
           self.tracks = [...new Set(Object.entries(answer.data)
