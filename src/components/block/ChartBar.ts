@@ -1,5 +1,5 @@
-import { Component, Prop, Vue } from 'vue-property-decorator'
-import { IChartPieSetting } from '@/types'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { IChartBarMusicSetting } from '@/types'
 import { CreateElement, VNode } from 'vue/types'
 import { SystemModule } from '@/store/modules/system'
 import * as d3 from 'd3'
@@ -8,28 +8,26 @@ import * as d3 from 'd3'
   name: 'ChartBar'
 })
 export default class ChartPie extends Vue {
-  @Prop({ type: Object, required: true }) settings!: IChartPieSetting
+  @Prop({ type: Object, required: true }) settings!: IChartBarMusicSetting
 
-  get infoBlock() {
-    if (this.settings.value.id) {
-      return SystemModule.getSystemInfoBlock(this.settings.value.id)
-    }
-    return false
+  isHover = false
+  barWidth = 4
+  width = 0
+  cursorIndex = 0
+
+  get amountBars() {
+    return Math.ceil(this.width / this.barWidth)
   }
 
-  get percent() {
-    const { current, min, max } = this.infoBlock ? this.infoBlock.value : this.settings.value
-    const onePercent = ((max || 100) - (min || 0)) / 100
-    return current / onePercent
+  get currentTimeIndex() {
+    return Math.ceil(this.settings.currentTime / (this.settings.allTime / this.amountBars))
   }
 
-  get value() {
-    const handle: Function = this.settings.computeValue || ((value: number) => value)
-    return this.infoBlock ? handle(this.infoBlock.value.current) : handle(this.settings.value.current)
-  }
+  @Watch('currentTimeIndex')
+  handleTimeIndex() { this.updateBarsView() }
 
   render(h: CreateElement): VNode {
-    return h('svg', { ref: 'svgPie', class: ['chart-bar position-center'] })
+    return h('svg', { ref: 'svg', class: ['chart-bar position-center'] })
   }
 
   mounted() {
@@ -39,23 +37,18 @@ export default class ChartPie extends Vue {
   async initChart() {
     const that = this
     const margin = 10
-    const width = this.$refs.svgPie.parentElement.offsetWidth
-    const height = this.$refs.svgPie.parentElement.offsetHeight
-    const node = this.$refs.svgPie
+    const width = this.$refs.svg.parentElement.offsetWidth
+    const height = this.$refs.svg.parentElement.offsetHeight
+    const node = this.$refs.svg
     let svgRaw = d3.select(node as Element)
       .attr('width', width)
       .attr('height', height)
 
-    const barWidth = 4
-    const amountBars = Math.ceil(width / barWidth)
-    const data = Array.from(Array(amountBars)).map(item => Math.ceil(Math.random() * 256))
+    this.width = width
 
+    const data = Array.from(Array(this.amountBars)).map(item => Math.ceil(Math.random() * 256))
     const svg = svgRaw.append('g')
-
-    let currentTime = 92
-    const allTime = 214
-    const calculateCurrentTimeIndex = () => Math.ceil(currentTime / (allTime / amountBars))
-    let currentTimeIndex = calculateCurrentTimeIndex()
+    const { currentTime, allTime } = this.settings
 
     const x = d3.scaleLinear()
       .domain([0, d3.max(data) || 5])
@@ -65,10 +58,10 @@ export default class ChartPie extends Vue {
       .data(data)
       .enter()
       .append('rect')
-      .attr('transform', (d, i) => `translate(${i * barWidth}, ${(height - x(d)) / 2})`)
+      .attr('transform', (d, i) => `translate(${i * this.barWidth}, ${(height - x(d)) / 2})`)
       .attr('fill', 'var(--color-active)')
-      .attr('opacity', (d, i) => i > currentTimeIndex ? 0.5 : 1)
-      .attr('width', barWidth)
+      .attr('opacity', (d, i) => i > this.currentTimeIndex ? 0.5 : 1)
+      .attr('width', this.barWidth)
       .attr('height', x)
 
     const body = svgRaw.append('rect')
@@ -77,35 +70,45 @@ export default class ChartPie extends Vue {
       .attr('opacity', 0)
 
     const calculateCursorIndex = (width: number): number => {
-      return Math.ceil(width / barWidth)
+      return Math.ceil(width / this.barWidth)
     }
 
     body.on('mouseenter', () => {
-      const cursorIndex = calculateCursorIndex(d3.event.offsetX)
+      this.cursorIndex = calculateCursorIndex(d3.event.offsetX)
+      this.isHover = true
       svg.selectAll('rect')
         .attr('opacity', (_, y) => {
-          return y > cursorIndex ? 0.5 : 1
+          return y > this.cursorIndex ? 0.5 : 1
         })
     }).on('mousemove', () => {
-      const cursorIndex = calculateCursorIndex(d3.event.offsetX)
+      this.cursorIndex = calculateCursorIndex(d3.event.offsetX)
       svg.selectAll('rect')
-        .attr('opacity', (_, y) => {
-          if (currentTimeIndex > cursorIndex) {
-            return y < cursorIndex ? 1 : y > currentTimeIndex ? 0.4 : 0.7
-          } else {
-            return y < currentTimeIndex ? 1 : y > cursorIndex ? 0.4 : 0.7
-          }
-        })
+        .attr('opacity', (_, y) => this.computeOpacityBar(y))
     }).on('mouseleave', () => {
+      this.isHover = false
       svg.selectAll('rect')
-        .attr('opacity', (d, i) => i > currentTimeIndex ? 0.5 : 1)
+        .attr('opacity', (d, i) => i > this.currentTimeIndex ? 0.5 : 1)
+    }).on('click', () => {
+      this.$emit('updateTime', Math.ceil(calculateCursorIndex(d3.event.offsetX) * (allTime / this.amountBars)))
     })
+  }
 
-    setInterval(() => {
-      currentTime++
-      currentTimeIndex = calculateCurrentTimeIndex()
-      svg.selectAll('rect')
-        .attr('opacity', (d, i) => i > currentTimeIndex ? 0.5 : 1)
-    }, 1000)
+  updateBarsView() {
+    d3.select(this.$refs.svg as Element)
+      .select('g')
+      .selectAll('rect')
+      .attr('opacity', (_, i) => this.computeOpacityBar(i))
+  }
+
+  computeOpacityBar(barIndex: number) {
+    if (this.currentTimeIndex === this.cursorIndex && this.isHover) {
+      return this.currentTimeIndex > barIndex ? 1 : 0.4
+    } else if (this.currentTimeIndex > this.cursorIndex && this.isHover) {
+      return barIndex < this.cursorIndex ? 1 : barIndex > this.currentTimeIndex ? 0.4 : 0.7
+    } else if (this.currentTimeIndex < this.cursorIndex && this.isHover) {
+      return barIndex < this.currentTimeIndex ? 1 : barIndex > this.cursorIndex ? 0.4 : 0.7
+    } else {
+      return this.currentTimeIndex > barIndex ? 1 : 0.5
+    }
   }
 }

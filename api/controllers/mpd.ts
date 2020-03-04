@@ -97,6 +97,10 @@ export class MPDSocket {
             await mpdClient.sendCommands([['next', []]])
             break
 
+          case 'UPDATE_TIME':
+            await mpdClient.sendCommands([['seekcur', [msg.data]]])
+            break
+
           case 'PLAY':
             if (msg.data && msg.data.stream) {
               mpdClient.playStation(msg.data.stream, (error: Error) => {
