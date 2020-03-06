@@ -1,6 +1,21 @@
 @import './mixins.styl'
 @import './general/index.styl'
 
+
+::-webkit-scrollbar
+  width 4px
+  &:hover
+    cursor pointer
+
+/* Track */
+::-webkit-scrollbar-track
+  background transparent
+
+/* Handle */
+::-webkit-scrollbar-thumb
+  background var(--color-active)
+  border-radius 2px
+
 html
   font-family 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
