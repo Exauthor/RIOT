@@ -8,6 +8,7 @@ import SettingsWidget from '@/components/block/widget/SettingsWidget'
 import AudioWidget from '@/components/block/widget/AudioWidget'
 
 import { PageModule } from '@/store/modules/page'
+import { ColorModule } from '@/store/modules/color'
 
 @Component({
   name: 'WidgetBlock',
@@ -36,7 +37,7 @@ export default class extends Vue {
 
     return h('div',
       {
-        style: this.isActiveBlock ? `box-shadow: 0 0 7px 0px var(${this.block.color || '--color-active'})` : '',
+        style: (this.isActiveBlock ? `box-shadow: 0 0 7px 0px var(${this.block.color || '--color-active'});` : '') + `background: ${ColorModule.bgLighter};`,
         on: { click: this.handleClick },
         class: this.classes
       }, [ child ])
@@ -55,6 +56,11 @@ export default class extends Vue {
     const block = PageModule.getActiveBlock
     return block ? block.id === this.block.id : !!block
   }
+
+  // mounted() {
+  // `background: ${ColorModule.colorDarker}`
+  // console.log(ColorModule.bgLighter)
+  // }
 
   handleClick() {
     if (this.block.id === (PageModule.getActiveBlock && PageModule.getActiveBlock.id)) {

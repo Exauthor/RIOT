@@ -1,0 +1,74 @@
+.audio-block
+  width 100%
+  height 100%
+  display flex
+  flex-direction column
+
+.audio-block__header
+  display flex
+  padding-left 6px
+
+.audio-block__title
+  width 100%
+  text-align center
+  padding 6px 0
+  text-overflow ellipsis
+  overflow hidden
+  white-space nowrap
+
+.audio-block__actions
+  width 30%
+  padding 0 6px
+  height 100%
+  display flex 
+  align-items center
+
+.audio-block__action
+  width 30px
+  height 30px
+  border 2px solid
+
+.audio-block__body
+  height 80%
+  width 100%
+  position relative
+
+.audio-block__record
+  width 30px
+  height 30px
+  cursor pointer
+  border-radius 50%
+  box-shadow 0 0 2px 2px currentColor
+  background var(--active-color)
+  background-origin content-box
+  center()
+  transition .5s
+  display flex
+  justify-content center
+  align-items center
+  &::before
+    content ''
+    display block
+    width 80%
+    height 80%
+    transition .3s
+    border-radius 50%
+  &:hover
+    &::before
+      background currentColor
+      opacity .7
+
+
+.audio-block__record--active
+  top calc(100% - 25px)
+  &::before
+    background currentColor
+  &:hover
+    &::before
+      background currentColor
+      filter brightness(1)
+      opacity 1
+
+.audio-block__canvas
+  width 100%
+  height 100%

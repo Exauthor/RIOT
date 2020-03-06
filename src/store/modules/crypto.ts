@@ -3,13 +3,13 @@ import { Coin } from '@/types/dto/crypto'
 import store from '@/store'
 import axios from 'axios'
 
-export interface CryptoStage {
+export interface CryptoState {
   coins: Array<Coin>;
   coinsDefaultSequence: string[];
 }
 
 @Module({ dynamic: true, store, name: 'crypto' })
-class Crypto extends VuexModule implements CryptoStage {
+class Crypto extends VuexModule implements CryptoState {
   coins = []
   coinsDefaultSequence = ['bitcoin', 'ethereum', 'cardano', 'neo']
 

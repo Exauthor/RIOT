@@ -1,47 +1,152 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CreateElement, VNode } from 'vue/types'
-import ChartBar from '@/components/block/ChartBar.ts'
+
+import { ColorModule } from '@/store/modules/color'
+
+let audioContext: any = null
+let mediaRecorder: any = null
+let analyser: any = null
+let bufferLength: any = null
+let dataArray: any = null
+let currentTimeInterval: any = null
 
 @Component({
-  name: 'WidgetMpd'
+  name: 'AudioWidget'
 })
 export default class extends Vue {
   @Prop() settings!: any;
 
-  record: boolean = false
+  isRecord: boolean = false
+  currentTime: number = 0
 
   render(h: CreateElement): VNode {
-    return h('div', ['AudioWidget'])
-    // return h(ChartBar, { props: { settings: { value: [1, 2, 3, 4] } } })
+    return h('div', { class: ['audio-block'] }, [
+      h('div', { class: 'audio-block__header' }, [
+        h('div', { class: 'audio-block__title' }, this.isRecord ? `Audio in recording ${this.currentTime}` : 'Audio header title'),
+        h('div', { class: 'audio-block__actions' }, [
+          this.isRecord || (mediaRecorder && mediaRecorder.state === 'pause')
+            ? h('div', {
+              class: 'audio-block__action audio-block__action--stop',
+              on: {
+                click: () => this.toggleRecord('stop')
+              }
+            })
+            : undefined
+        ])
+      ]),
+      h('div', { class: 'audio-block__body' }, [
+        h('canvas', {
+          class: 'audio-block__canvas',
+          ref: 'canvas'
+        }),
+        h('div', {
+          class: {
+            'audio-block__record': true,
+            'audio-block__record--active': this.isRecord
+          },
+          on: {
+            click: this.toggleRecord
+          }
+        })
+      ])
+    ])
   }
 
   mounted() {
-    if (!this.record) {
-      return
+    this.toggleRecord()
+  }
+
+  toggleRecord(option?: string) {
+    const self = this
+    if (mediaRecorder && option === 'stop') {
+      mediaRecorder.stop()
+      mediaRecorder = null
+
+      this.isRecord = false
+      this.currentTime = 0
+      clearInterval(currentTimeInterval)
+    } else if (!this.isRecord && mediaRecorder) {
+      this.isRecord = true
+      currentTimeInterval = setInterval(() => self.currentTime++, 1000)
+
+      mediaRecorder.resume()
+    } else if (!this.isRecord && !mediaRecorder) {
+      this.isRecord = true
+      currentTimeInterval = setInterval(() => self.currentTime++, 1000)
+
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          mediaRecorder = new MediaRecorder(stream)
+          mediaRecorder.start()
+
+          const audioChunks: any = []
+
+          mediaRecorder.addEventListener('dataavailable', (event: any) => {
+            audioChunks.push(event.data)
+          })
+
+          audioContext = new AudioContext()
+          const source = audioContext.createMediaStreamSource(stream)
+
+          analyser = audioContext.createAnalyser()
+          analyser.fftSize = 2048
+          bufferLength = analyser.frequencyBinCount
+          dataArray = new Uint8Array(bufferLength)
+
+          source.connect(analyser)
+          self.draw()
+
+          mediaRecorder.addEventListener('stop', (data: any) => {
+            // const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' })
+            // const audioUrl = URL.createObjectURL(audioBlob)
+            // const audio = new Audio(audioUrl)
+            // audio.play()
+          })
+        })
+    } else {
+      mediaRecorder.pause()
+
+      this.isRecord = false
+      clearInterval(currentTimeInterval)
     }
-    navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        const mediaRecorder = new MediaRecorder(stream)
-        mediaRecorder.start()
-        const audioChunks: any = []
+  }
 
-        mediaRecorder.addEventListener('dataavailable', (event: any) => {
-          audioChunks.push(event.data)
-          console.log(event)
-        })
+  draw() {
+    const { canvas } = this.$refs
+    const WIDTH = canvas.width
+    const HEIGHT = canvas.height
+    const canvasCtx = canvas.getContext('2d')
 
-        mediaRecorder.addEventListener('stop', () => {
-          const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' })
-          // this.downloadBlob(new Blob(audioChunks))
-          const audioUrl = URL.createObjectURL(audioBlob)
-          const audio = new Audio(audioUrl)
-          audio.play()
-        })
+    requestAnimationFrame(this.draw)
 
-        setTimeout(() => {
-          mediaRecorder.stop()
-        }, 6000)
-      })
+    analyser.getByteTimeDomainData(dataArray)
+
+    canvasCtx.fillStyle = ColorModule.bgLighter
+    canvasCtx.fillRect(0, 0, WIDTH, HEIGHT)
+
+    canvasCtx.lineWidth = 1
+    canvasCtx.strokeStyle = this.isRecord ? ColorModule.color : ColorModule.colorDarkest
+
+    canvasCtx.beginPath()
+
+    let sliceWidth = WIDTH * 1.0 / bufferLength
+    let x = 0
+
+    for (let i = 0; i < bufferLength; i++) {
+      let v = dataArray[i] / 128.0
+      let y = v * HEIGHT / 2
+
+      if (i === 0) {
+        canvasCtx.moveTo(x, y)
+      } else {
+        canvasCtx.lineTo(x, y)
+      }
+
+      x += sliceWidth
+    }
+
+    canvasCtx.lineTo(canvas.width, canvas.height / 2)
+    canvasCtx.stroke()
   }
 
   downloadBlob(blob: any) {

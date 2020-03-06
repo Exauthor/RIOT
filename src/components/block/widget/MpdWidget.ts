@@ -4,7 +4,7 @@ import { IMpdHeaderInterface, IMpdTrackStatus } from '@/types'
 import ChartBar from '@/components/block/ChartBar.ts'
 
 @Component({
-  name: 'WidgetMpd'
+  name: 'MpdWidget'
 })
 export default class extends Vue {
   @Prop() settings!: any;

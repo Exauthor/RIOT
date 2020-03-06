@@ -76,7 +76,7 @@ export class MPDSocket {
             break
 
           case 'REQUEST_ELAPSED':
-            mpdClient.getElapsed(function(error: any, elapsed: any) {
+            mpdClient.getElagetElapsedpsed(function(error: any, elapsed: any) {
               if (error) {
                 self.sendWSSMessage(ws, 'MPD_OFFLINE', null)
               } else {

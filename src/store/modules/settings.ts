@@ -36,12 +36,6 @@ class Settings extends VuexModule implements SettingsState {
     },
     {
       id: UtilsModule.getUUID(),
-      title: 'Crypto info',
-      component: 'CryptoWidget',
-      size: [4, 1]
-    },
-    {
-      id: UtilsModule.getUUID(),
       title: 'RAM Amount',
       component: 'SettingsWidget',
       url: '/settings',
