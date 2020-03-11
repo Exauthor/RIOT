@@ -80,9 +80,7 @@ export default class extends Vue {
             h('div', { class: 'mpd-block__chart' }, [
               h(ChartBar, {
                 key: this.trackName,
-                on: {
-                  updateTime: this.updateTime
-                },
+                on: { updateTime: this.updateTime },
                 props: {
                   settings: {
                     currentTime: this.currentTime,
@@ -103,9 +101,7 @@ export default class extends Vue {
                 }
                 if (icon.actions && icon.actions.function) {
                   optionIcon.on = {
-                    click: () => {
-                      return icon.actions.function(...(icon.actions.arguments || []))
-                    }
+                    click: () => icon.actions.function(...(icon.actions.arguments || []))
                   }
                 }
                 return h('div', optionIcon)

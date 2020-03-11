@@ -1,34 +1,53 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Index from '../views/IndexPage'
-import Settings from '../views/SettingsPage'
+import VueRouter, { RouteConfig, Route } from 'vue-router'
+import IndexPage from '../views/IndexPage'
+import MpdPage from '../views/MpdPage'
+import SettingsPage from '../views/SettingsPage'
 
 Vue.use(VueRouter)
 
-const routes = [
+interface IRouterMeta {
+  meta: {
+    headerTitle: string
+  }
+}
+
+const routes: Array<RouteConfig & IRouterMeta> = [
   {
     path: '/',
     name: 'index',
-    component: Index,
+    component: IndexPage,
     meta: {
-      layout: 'none'
+      headerTitle: 'Main Page'
     }
   },
   {
     path: '/settings',
     name: 'settings',
-    component: Settings,
+    component: SettingsPage,
     meta: {
-      headerTitle: 'Settings',
-      layout: 'none'
+      headerTitle: 'Settings'
+    }
+  },
+  {
+    path: '/mpd',
+    name: 'mpd',
+    component: MpdPage,
+    meta: {
+      headerTitle: 'MPD'
     }
   }
 ]
 
-const router = new VueRouter({
+const router: VueRouter = new VueRouter({
   mode: 'history',
   base: process.env.BASE_URL,
   routes
+})
+
+router.beforeEach((to: Route, from: Route, next: Function) => {
+  document.title = to.meta.headerTitle
+  next()
 })
 
 export default router
