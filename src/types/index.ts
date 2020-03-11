@@ -1,6 +1,7 @@
 export interface IWidgetBlock {
   id: string
   title: string
+  noRedirect?: boolean
   about?: string
   url?: string
   component: string

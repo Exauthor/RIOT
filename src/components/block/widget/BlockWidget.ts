@@ -10,6 +10,8 @@ import AudioWidget from '@/components/block/widget/AudioWidget'
 import { PageModule } from '@/store/modules/page'
 import { ColorModule } from '@/store/modules/color'
 
+let isDoubleClick: any = false
+
 @Component({
   name: 'WidgetBlock',
   components: {
@@ -57,18 +59,19 @@ export default class extends Vue {
     return block ? block.id === this.block.id : !!block
   }
 
-  // mounted() {
-  // `background: ${ColorModule.colorDarker}`
-  // console.log(ColorModule.bgLighter)
-  // }
+  handleClick(event: Event) {
+    const activeBlockId = PageModule.getActiveBlock && PageModule.getActiveBlock.id
+    const canRoute = !this.block.noRedirect || isDoubleClick
 
-  handleClick() {
-    if (this.block.id === (PageModule.getActiveBlock && PageModule.getActiveBlock.id)) {
+    isDoubleClick = setTimeout(() => { isDoubleClick = false }, 250)
+
+    if (this.block.id === activeBlockId && canRoute) {
       if (this.block.url) {
         this.$router.push(this.block.url)
       }
       return
     }
+
     PageModule.UPDATE_ACTIVE_BLOCK({
       id: this.block.id,
       title: this.block.title

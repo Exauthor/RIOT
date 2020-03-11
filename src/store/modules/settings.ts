@@ -15,6 +15,8 @@ class Settings extends VuexModule implements SettingsState {
       id: UtilsModule.getUUID(),
       title: 'MDP Server',
       widget: 'MDP',
+      url: '/mpd',
+      noRedirect: true,
       component: 'MpdWidget',
       size: [4, 1]
     },
