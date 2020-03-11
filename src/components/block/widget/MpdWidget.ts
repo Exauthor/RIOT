@@ -1,7 +1,9 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { CreateElement, VNode } from 'vue/types'
-import { IMpdHeaderInterface, IMpdTrackStatus } from '@/types'
+import { IMpdHeaderInterface } from '@/types'
 import ChartBar from '@/components/block/ChartBar.ts'
+
+import { MpdModule } from '@/store/modules/MpdModule'
 
 @Component({
   name: 'MpdWidget'
@@ -9,17 +11,7 @@ import ChartBar from '@/components/block/ChartBar.ts'
 export default class extends Vue {
   @Prop() settings!: any;
 
-  socket: any
-  wsUri: string = 'ws://localhost:3000'
-  socketInfo: any = {}
-  mpdInfo: IMpdTrackStatus | null = null
-  intervalTimer: any = null
-  currentTime: number = 0
-  tracks: any[] = [
-    {
-      title: 'Летов - всё как у людей'
-    }
-  ]
+  currentTime = 0
 
   get mpdHeaderInterface() {
     const mpdHeaderInterface: IMpdHeaderInterface[] = []
@@ -33,10 +25,10 @@ export default class extends Vue {
     })
     mpdHeaderInterface.push({
       icon: 'play',
-      class: `mpd-block__icon mpd-block__icon--play ${this.mpdInfo && this.mpdInfo.state === 'pause' && 'mpd-block__icon--play-stop'}`,
+      class: `mpd-block__icon mpd-block__icon--play ${MpdModule.mpdTrackInfo && MpdModule.mpdTrackInfo.state === 'pause' && 'mpd-block__icon--play-stop'}`,
       innerHTML: '<div class="mpd-block__icon--play-line"></div>',
       actions: {
-        function: this.togglePlayTrack
+        function: MpdModule.togglePlayTrack
       }
     })
     mpdHeaderInterface.push({
@@ -58,33 +50,22 @@ export default class extends Vue {
     return mpdHeaderInterface
   }
 
-  get trackName(): string {
-    if (!this.mpdInfo) return 'Not a file'
-
-    const { artist, title, file } = this.mpdInfo
-    if (artist || title) {
-      return `${this.mpdInfo.artist} - ${this.mpdInfo.title}`
-    }
-
-    return file ? this.formatTrackFromFile(file) : 'Unknown file'
-  }
-
   render(h: CreateElement): VNode {
-    if (this.mpdInfo && this.mpdInfo.file) {
+    if (MpdModule.mpdTrackInfo && MpdModule.mpdTrackInfo.file) {
       return h('div', { class: 'mpd-block' },
         [
           h('div', { class: 'mpd-block__body' }, [
             h('div', { class: 'mpd-block__header' }, [
-              h('h4', { class: 'mpd-block__title' }, this.trackName)
+              h('h4', { class: 'mpd-block__title' }, MpdModule.trackName)
             ]),
             h('div', { class: 'mpd-block__chart' }, [
               h(ChartBar, {
-                key: this.trackName,
+                key: MpdModule.trackName,
                 on: { updateTime: this.updateTime },
                 props: {
                   settings: {
                     currentTime: this.currentTime,
-                    allTime: parseInt(this.mpdInfo.time.split(':')[1])
+                    allTime: parseInt(MpdModule.mpdTrackInfo.time.split(':')[1])
                   }
                 }
               })
@@ -108,7 +89,7 @@ export default class extends Vue {
               })
             ),
             h('div', { class: 'mpd-block__track-list' },
-              this.tracks.map(track => {
+              MpdModule.tracks.map(track => {
                 return h('div', {
                   class: 'mpd-block__track-item',
                   on: {
@@ -129,11 +110,11 @@ export default class extends Vue {
   }
 
   setPlayTrack(position: number) {
-    this.sendCommand(position === 1 ? 'NEXT' : 'PREVIOUS')
+    MpdModule.sendCommand({ command: position === 1 ? 'NEXT' : 'PREVIOUS' })
   }
 
   setPlayTrackById(id: number) {
-    this.sendCommand('SET_TRACK', id)
+    MpdModule.sendCommand({ command: 'SET_TRACK', arg: id })
   }
 
   toggleRepeat() {
@@ -141,58 +122,15 @@ export default class extends Vue {
   }
 
   updateTime(time: number) {
-    this.sendCommand('UPDATE_TIME', time)
+    this.currentTime = time
+
+    MpdModule.sendCommand({ command: 'UPDATE_TIME', arg: time })
   }
 
-  async togglePlayTrack(play?: boolean) {
-    if (play || (this.mpdInfo && this.mpdInfo.state === 'pause')) {
-      clearInterval(this.intervalTimer)
-      this.intervalTimer = setInterval(() => this.currentTime++, 1000)
-      this.sendCommand('PLAY')
-    } else {
-      clearInterval(this.intervalTimer)
-      this.sendCommand('PAUSE')
-    }
-  }
-
-  sendCommand(command: string, arg?: any) {
-    this.socket.send(JSON.stringify({ type: command, data: arg || {} }))
-  }
-
-  mounted() {
-    this.socket = new WebSocket(this.wsUri)
-    const self = this
-    this.socket.onopen = function(event: any) {
-      self.sendCommand('STATUS')
-      self.sendCommand('PLAYLIST')
-    }
-    this.socket.onclose = function(event: any) {
-      this.socketInfo = { type: 'info', event }
-    }
-    this.socket.onmessage = function(event: any) {
-      const answer = JSON.parse(event.data)
-      switch (answer.type) {
-        case 'STATUS':
-          self.mpdInfo = answer.data
-          self.currentTime = parseInt(answer.data.time.split(':')[0])
-          if (answer.data.state === 'play') {
-            clearInterval(self.intervalTimer)
-            self.intervalTimer = setInterval(() => self.currentTime++, 1000)
-          }
-          break
-        case 'PLAYLIST':
-          self.tracks = [...new Set(Object.entries(answer.data)
-            .map((track: any) => Object({
-              title: self.formatTrackFromFile(track[1]),
-              id: parseInt(track[0].split(':')[0]) + 1
-            }))
-            .map(music => JSON.stringify({ title: music.title })))].map((music, index) => Object.assign(JSON.parse(music), { id: index + 1 }))
-
-          break
-      }
-    }
-    this.socket.onerror = function(event: any) {
-      this.socketInfo = { type: 'error', event }
-    }
+  async mounted() {
+    await MpdModule.setConnection()
+    setInterval(() => {
+      this.currentTime = MpdModule.getCurrentTime()
+    }, 1000)
   }
 }
