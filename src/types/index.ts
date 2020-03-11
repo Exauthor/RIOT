@@ -101,3 +101,8 @@ export interface IMpdTrackStatus {
   time: string
   title: string
 }
+
+export interface ITrack {
+  title: string
+  id: number
+}

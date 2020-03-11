@@ -1,7 +1,6 @@
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { IChartBarMusicSetting } from '@/types'
 import { CreateElement, VNode } from 'vue/types'
-import { SystemModule } from '@/store/modules/system'
 import * as d3 from 'd3'
 
 @Component({
@@ -60,7 +59,7 @@ export default class ChartPie extends Vue {
       .append('rect')
       .attr('transform', (d, i) => `translate(${i * this.barWidth}, ${(height - x(d)) / 2})`)
       .attr('fill', 'var(--color-active)')
-      .attr('opacity', (d, i) => i > this.currentTimeIndex ? 0.5 : 1)
+      .attr('opacity', (_, i) => i > this.currentTimeIndex ? 0.5 : 1)
       .attr('width', this.barWidth)
       .attr('height', x)
 
@@ -70,7 +69,8 @@ export default class ChartPie extends Vue {
       .attr('opacity', 0)
 
     const calculateCursorIndex = (width: number): number => {
-      return Math.ceil(width / this.barWidth)
+      const cursorWidth = 4
+      return Math.ceil((width - cursorWidth) / this.barWidth)
     }
 
     body.on('mouseenter', () => {
@@ -87,7 +87,7 @@ export default class ChartPie extends Vue {
     }).on('mouseleave', () => {
       this.isHover = false
       svg.selectAll('rect')
-        .attr('opacity', (d, i) => i > this.currentTimeIndex ? 0.5 : 1)
+        .attr('opacity', (_, i) => i > this.currentTimeIndex ? 0.5 : 1)
     }).on('click', () => {
       this.$emit('updateTime', Math.ceil(calculateCursorIndex(d3.event.offsetX) * (allTime / this.amountBars)))
     })
