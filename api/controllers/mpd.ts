@@ -150,7 +150,7 @@ export class MPDSocket {
     } else if (Array.isArray(data)) {
       return data.map(value => this.objectToLowerCase(value))
     } else if (typeof data === 'object') {
-      var retData: any = {}
+      const retData: any = {}
       for (const [key, value] of Object.entries(data)) {
         retData[key.toLowerCase()] = this.objectToLowerCase(value)
       }

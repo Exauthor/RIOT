@@ -33,7 +33,7 @@ export default class extends Vue {
         settings: this.block
       }
     })
-    if (child.tag === this.block.component) {
+    if ((child as any).tag === this.block.component) {
       child = 'Component not found'
     }
 

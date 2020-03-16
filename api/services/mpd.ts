@@ -1,7 +1,7 @@
 
-var mpd = require('mpd')
-var cmd = mpd.cmd
-var debug = require('debug')('mpd.fm:mpdclient')
+const mpd = require('mpd')
+const cmd = mpd.cmd
+const debug = require('debug')('mpd.fm:mpdclient')
 
 interface IMPDConnection {
   port: string
@@ -13,8 +13,8 @@ interface IAdditionalSetupMPDServer {
 }
 
 // Private
-var Status = Object.freeze({ 'disconnected': 1, 'connecting': 2, 'reconnecting': 3, 'ready': 4 })
-var updateClients: any = []
+const Status = Object.freeze({ 'disconnected': 1, 'connecting': 2, 'reconnecting': 3, 'ready': 4 })
+let updateClients: any = []
 
 export class MPD implements IAdditionalSetupMPDServer {
   mpdClient: any = null
@@ -109,8 +109,8 @@ export class MPD implements IAdditionalSetupMPDServer {
         if (error) {
           callback(error)
         } else {
-          var data = mpd.parseKeyValueMessage(msg)
-          var elapsed: any = { elapsed: 0 }
+          let data = mpd.parseKeyValueMessage(msg)
+          let elapsed: any = { elapsed: 0 }
           for (const [key, value] of Object.entries(data)) {
             if (key.toLowerCase() === 'elapsed') {
               elapsed.elapsed = value

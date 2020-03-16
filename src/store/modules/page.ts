@@ -3,7 +3,7 @@ import { IActiveBlock } from '@/types'
 import store from '@/store'
 
 export interface PageState {
-  layout: string,
+  layout: String,
   activeBlocks: Array<IActiveBlock>,
   activeBlockLinks: Array<String>
 }
@@ -11,11 +11,11 @@ export interface PageState {
 @Module({ dynamic: true, store, name: 'page' })
 class Page extends VuexModule implements PageState {
   layout = 'default'
-  activeBlocks = []
-  activeBlockLinks = []
+  activeBlocks: Array<IActiveBlock> = []
+  activeBlockLinks: Array<string> = []
 
   @Mutation
-  UPDATE_ACTIVE_BLOCK(block: IActiveBlock): void {
+  UPDATE_ACTIVE_BLOCK(block: IActiveBlock) {
     this.activeBlocks = [ block ]
     this.activeBlockLinks = [ block.id ]
   }
