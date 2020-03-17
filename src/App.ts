@@ -1,9 +1,12 @@
 import { Component, Vue } from 'vue-property-decorator'
+import { CreateElement, VNode } from 'vue/types'
 import { PageModule } from '@/store/modules/page'
+
 import noneLayout from '@/layout/none.ts'
 import defaultLayout from '@/layout/default.ts'
+
 import { SystemModule } from '@/store/modules/system'
-import { CreateElement, VNode } from 'vue/types'
+import { ColorModule } from '@/store/modules/color'
 
 @Component({
   name: 'App',
@@ -23,6 +26,7 @@ export default class extends Vue {
 
   mounted() {
     SystemModule.getSystemInfo()
+    ColorModule.setMainColors()
     setInterval(SystemModule.getSystemInfo, 30000)
   }
 }

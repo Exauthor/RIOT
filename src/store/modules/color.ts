@@ -1,22 +1,20 @@
-import { Module, VuexModule, getModule } from 'vuex-module-decorators'
+import { Module, VuexModule, getModule, Action } from 'vuex-module-decorators'
 import store from '@/store'
 
 export interface ColorState {}
 
 @Module({ dynamic: true, store, name: 'color' })
 class Color extends VuexModule implements ColorState {
+  get getGlobalCSSVariable() {
+    return (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name)
+  }
+
   get mainColor() {
-    return () => {
-      let style = getComputedStyle(document.body)
-      return style.getPropertyValue('--color-active')
-    }
+    return () => this.getGlobalCSSVariable('--color-active')
   }
 
   get bgColor() {
-    return () => {
-      let style = getComputedStyle(document.body)
-      return style.getPropertyValue('--color-bg')
-    }
+    return () => this.getGlobalCSSVariable('--color-bg')
   }
 
   get color() {
@@ -27,7 +25,7 @@ class Color extends VuexModule implements ColorState {
     return this.bgColor().trim()
   }
 
-  get bgLighter() {
+  get bgDark() {
     return this.changeHsl(this.convertToHsl(this.bg), 0, -0, -5)
   }
 
@@ -96,7 +94,7 @@ class Color extends VuexModule implements ColorState {
         return formatString()
       }
 
-      var d = (max - min)
+      let d = (max - min)
       s = l >= 0.5 ? d / (2 - (max + min)) : d / (max + min)
       switch (max) {
         case r: h = ((g - b) / d + 0) * 60; break
@@ -106,6 +104,16 @@ class Color extends VuexModule implements ColorState {
 
       return formatString()
     }
+  }
+
+  @Action
+  setMainColors() {
+    this.setGlobalCSSVariable({ name: '--color-bg-light', value: this.bgDark || 'hsl(258, 48%, 7%)' })
+  }
+
+  @Action
+  setGlobalCSSVariable({ name, value }: { name: string, value: string }) {
+    document.documentElement.style.setProperty(name, value)
   }
 }
 
