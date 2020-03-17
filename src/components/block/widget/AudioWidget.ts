@@ -19,10 +19,17 @@ export default class extends Vue {
   isRecord: boolean = false
   currentTime: number = 0
 
+  get audioRecordTitle(): string {
+    if (this.isRecord || this.currentTime) {
+      return `Audio in record${this.isRecord ? 'ing' : 'ed'}: ${this.currentTime} second${this.currentTime > 1 ? 's' : ''}`
+    }
+    return 'Start a record'
+  }
+
   render(h: CreateElement): VNode {
     return h('div', { class: ['audio-block'] }, [
       h('div', { class: 'audio-block__header' }, [
-        h('div', { class: 'audio-block__title' }, this.isRecord ? `Audio in recording ${this.currentTime}` : 'Audio header title'),
+        h('div', { class: 'audio-block__title' }, this.audioRecordTitle),
         h('div', { class: 'audio-block__actions' }, [
           this.isRecord || (mediaRecorder && mediaRecorder.state === 'pause')
             ? h('div', {
@@ -60,24 +67,21 @@ export default class extends Vue {
     const self = this
     if (mediaRecorder && option === 'stop') {
       mediaRecorder.stop()
-      mediaRecorder = null
-
-      this.isRecord = false
-      this.currentTime = 0
-      clearInterval(currentTimeInterval)
     } else if (!this.isRecord && mediaRecorder) {
       this.isRecord = true
       currentTimeInterval = setInterval(() => self.currentTime++, 1000)
 
       mediaRecorder.resume()
     } else if (!this.isRecord && !mediaRecorder) {
-      this.isRecord = true
-      currentTimeInterval = setInterval(() => self.currentTime++, 1000)
-
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
           mediaRecorder = new MediaRecorder(stream)
           mediaRecorder.start()
+
+          if (mediaRecorder.state === 'recording') {
+            this.isRecord = true
+            currentTimeInterval = setInterval(() => self.currentTime++, 1000)
+          }
 
           const audioChunks: any = []
 
@@ -97,17 +101,20 @@ export default class extends Vue {
           self.draw()
 
           mediaRecorder.addEventListener('stop', (data: any) => {
-            // const audioBlob = new Blob(audioChunks, { type: 'audio/mpeg' })
-            // const audioUrl = URL.createObjectURL(audioBlob)
-            // const audio = new Audio(audioUrl)
-            // audio.play()
+            mediaRecorder = null
+
+            this.isRecord = false
+            this.currentTime = 0
+            clearInterval(currentTimeInterval)
+          })
+
+          mediaRecorder.addEventListener('pause', (data: any) => {
+            this.isRecord = false
+            clearInterval(currentTimeInterval)
           })
         })
     } else {
       mediaRecorder.pause()
-
-      this.isRecord = false
-      clearInterval(currentTimeInterval)
     }
   }
 
@@ -121,7 +128,7 @@ export default class extends Vue {
 
     analyser.getByteTimeDomainData(dataArray)
 
-    canvasCtx.fillStyle = ColorModule.bgLighter
+    canvasCtx.fillStyle = ColorModule.bgDark
     canvasCtx.fillRect(0, 0, WIDTH, HEIGHT)
 
     canvasCtx.lineWidth = 1
