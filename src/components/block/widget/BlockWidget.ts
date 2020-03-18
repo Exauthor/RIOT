@@ -8,7 +8,6 @@ import SettingsWidget from '@/components/block/widget/SettingsWidget'
 import AudioWidget from '@/components/block/widget/AudioWidget'
 
 import { PageModule } from '@/store/modules/page'
-import { ColorModule } from '@/store/modules/color'
 
 let isDoubleClick: any = false
 
@@ -39,7 +38,7 @@ export default class extends Vue {
 
     return h('div',
       {
-        style: (this.isActiveBlock ? `box-shadow: 0 0 7px 0px var(${this.block.color || '--color-active'});` : '') + `background: ${ColorModule.bgLighter};`,
+        style: (this.isActiveBlock ? `box-shadow: 0 0 7px 0px var(${this.block.color || '--color-active'});` : ''),
         on: { click: this.handleClick },
         class: this.classes
       }, [ child ])

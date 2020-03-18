@@ -60,6 +60,14 @@ class Settings extends VuexModule implements SettingsState {
       title: 'Audio reset',
       component: 'AudioWidget',
       size: [3, 1]
+    },
+    {
+      id: UtilsModule.getUUID(),
+      title: 'Clock',
+      component: 'SettingsWidget',
+      url: '/settings',
+      size: [1, 1],
+      view: 'clock'
     }
   ]
 

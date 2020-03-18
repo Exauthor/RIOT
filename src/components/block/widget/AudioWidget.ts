@@ -21,13 +21,13 @@ export default class extends Vue {
 
   get audioRecordTitle(): string {
     if (this.isRecord || this.currentTime) {
-      return `Audio in record${this.isRecord ? 'ing' : 'ed'}: ${this.currentTime} second${this.currentTime > 1 ? 's' : ''}`
+      return `Audio is record${this.isRecord ? 'ing' : 'ed'}: ${this.currentTime} second${this.currentTime > 1 ? 's' : ''}`
     }
     return 'Start a record'
   }
 
   render(h: CreateElement): VNode {
-    return h('div', { class: ['audio-block'] }, [
+    return h('div', { class: ['audio-block', this.isRecord ? 'audio-block--recording' : ''] }, [
       h('div', { class: 'audio-block__header' }, [
         h('div', { class: 'audio-block__title' }, this.audioRecordTitle),
         h('div', { class: 'audio-block__actions' }, [
@@ -68,15 +68,17 @@ export default class extends Vue {
     if (mediaRecorder && option === 'stop') {
       mediaRecorder.stop()
     } else if (!this.isRecord && mediaRecorder) {
-      this.isRecord = true
-      currentTimeInterval = setInterval(() => self.currentTime++, 1000)
-
-      mediaRecorder.resume()
+      if (mediaRecorder.state === 'inactive') {
+        mediaRecorder.start()
+      } else {
+        mediaRecorder.resume()
+      }
+      // console.log(mediaRecorder)
     } else if (!this.isRecord && !mediaRecorder) {
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(stream => {
           mediaRecorder = new MediaRecorder(stream)
-          mediaRecorder.start()
+          // mediaRecorder.start()
 
           if (mediaRecorder.state === 'recording') {
             this.isRecord = true
@@ -99,6 +101,11 @@ export default class extends Vue {
 
           source.connect(analyser)
           self.draw()
+
+          mediaRecorder.addEventListener('resume', (data: any) => {
+            this.isRecord = true
+            currentTimeInterval = setInterval(() => self.currentTime++, 1000)
+          })
 
           mediaRecorder.addEventListener('stop', (data: any) => {
             mediaRecorder = null

@@ -19,11 +19,11 @@ class Mpd extends VuexModule implements MpdState {
   mpdTrackInfo = null
   wsUri = 'ws://localhost:3000'
   isConnect = false
-  tracks = []
+  tracks: ITrack[] = []
 
   @Mutation
-  SET_MPD_STATE<T extends MpdState, P extends keyof MpdState>({ key, value }: { key: P, value: T[P] }) {
-    (this as any)[key] = value
+  SET_MPD_STATE<T extends this, P extends keyof this>({ key, value }: { key: P, value: T[P] }) {
+    this[key] = value
   }
 
   get getCurrentTime() {
@@ -31,7 +31,7 @@ class Mpd extends VuexModule implements MpdState {
   }
 
   get trackName(): string {
-    if (this.mpdTrackInfo === null) return 'Not a file'
+    if (!this.mpdTrackInfo) return 'Not a file'
 
     const { artist, title, file } = this.mpdTrackInfo
     if (artist || title) {
