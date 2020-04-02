@@ -131,6 +131,6 @@ export default class extends Vue {
     await MpdModule.setConnection()
     setInterval(() => {
       this.currentTime = MpdModule.getCurrentTime()
-    }, 1000)
+    }, 50)
   }
 }
