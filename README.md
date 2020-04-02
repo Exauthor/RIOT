@@ -1,29 +1,4 @@
-# RIOT
+# 🌿 RIOT Preview 🌿
 
-## Project setup
-```
-yarn install
-```
+![out](https://user-images.githubusercontent.com/33872448/78293508-52219000-7531-11ea-8140-be0c30d2d7fb.gif)
 
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Run your unit tests
-```
-yarn test:unit
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
